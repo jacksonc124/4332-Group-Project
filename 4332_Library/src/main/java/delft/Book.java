@@ -1,13 +1,13 @@
 package delft;
 
 public class Book {
-    private String name;
-    private String author;
-    private int year;
-    private String ISBN;
-    private String bookID;
-    private boolean isAvailable;
-    private String genre;
+    public String name;
+    public String author;
+    public int year;
+    public String ISBN;
+    public String bookID;
+    public boolean isAvailable;
+    public String genre;
 
     // Constructor
     public Book(String name, String author, int year, String ISBN, String bookID, String genre) {
@@ -20,36 +20,7 @@ public class Book {
         this.isAvailable = true; // By default, a new book is available
     }
 
-    // Getters
-    public String getName() {
-        return name;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public String getISBN() {
-        return ISBN;
-    }
-
-    public String getBookID() {
-        return bookID;
-    }
-
-    public boolean isAvailable() {
-        return isAvailable;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    // Setters and Update Methods
+    // Update Method
     public void updateBookInfo(String name, String author, int year, String ISBN, String genre) {
         this.name = name;
         this.author = author;
@@ -62,13 +33,14 @@ public class Book {
         this.isAvailable = status;
     }
 
-    // Other Methods
+    // Check Availability of Book
     public boolean checkAvailability() {
         return isAvailable;
     }
 
+    // Book toString
     public void getBookInfo() {
-        System.out.println("java.Book ID: " + bookID);
+        System.out.println("Book ID: " + bookID);
         System.out.println("Title: " + name);
         System.out.println("Author: " + author);
         System.out.println("Year: " + year);
