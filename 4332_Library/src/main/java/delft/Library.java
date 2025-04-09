@@ -122,7 +122,7 @@ public class Library {
     //--- Member handling
 
     public void addMember(Member member) {
-        if (member != null) {
+        if (member != null && !this.MemberIDs.contains(member.memberID)) {
             this.MemberIDs.add(member.memberID);
         }
     }

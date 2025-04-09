@@ -257,6 +257,15 @@ public class LibraryTesting {
         assertEquals(library.MemberIDs.size(), 0);
     }
 
+    @Test
+    void addDupeMember() { // attempt to add a duplicate member
+        // should not update library variable
+        Member member = new Member(null, null, null, null);
+        library.addMember(member);
+        library.addMember(member);
+        assertEquals(library.MemberIDs.size(), 1);
+    }
+
     // revokeMembership()
     @Test
     void revokeMembership() { // member exists
