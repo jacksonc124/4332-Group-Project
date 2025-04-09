@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Member {
-    private String name;
-    private String email;
-    private String memberID;
-    private List<Book> BorrowedBookList;
+    public String name;
+    public String email;
+    public String memberID;
+    public List<Book> BorrowedBookList;
 
     // Constructor
     public Member(String name, String email, String memberID, List<Book> BorrowedBookList) {
