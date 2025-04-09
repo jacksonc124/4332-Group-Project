@@ -8,61 +8,62 @@ public class Library {
     public List<String> AvailableBookIDs;
     public HashMap<String, String> LoanedBooks; // HashMap of BookID, MemberID
     public List<Book> AllBooksInLibrary;
-    public List<String> MemberIDs; // may have to change based on Member implementation
+    public List<String> MemberIDs;
 
-    // Constructors
+    //--- Constructors
 
-    public Library() { // default constructor - no existing books or members
-        this.AllBooksInLibrary = null;
-        this.AvailableBookIDs = null;
-        this.LoanedBooks = null;
-        this.MemberIDs = null;
+    // default constructor - no existing books or members
+    public Library() { 
+        this.AllBooksInLibrary = new ArrayList<>();
+        this.AvailableBookIDs = new ArrayList<>();
+        this.LoanedBooks = new HashMap<>();
+        this.MemberIDs = new ArrayList<>();
     }
 
-    public Library(List<Book> books, List<Member> members) { // populate library w/ existing books & members
-        this.AllBooksInLibrary = books;
-        this.AvailableBookIDs = getBookIDs(books); // by default, all books are available
-        this.LoanedBooks = null;
-        this.MemberIDs = getMemberIDs(members);
-    }
+    // populate library w/ existing books & members
+    // would normally implement helper methods for grabbing the book/memberIDs, but
+    // UML does not list these so just dumping everything in the constructor
+    public Library(List<Book> books, List<Member> members) { 
+        this.LoanedBooks = new HashMap<>();
 
-    // Helper methods
-
-    private List<String> getBookIDs(List<Book> books) {
-        if (books == null) return null;
-
-        List<String> bookIDs = new ArrayList<String>();
-        for (Book book : books) {
-            bookIDs.add(book.bookID);
+        // library methods assume class variables are initialized, hence null checks
+        // of course, this relies on the promise that the Library variables are not modified externally...
+        // for the purposes of this, assuming that we can pretend that the public vars are "private"
+        this.AvailableBookIDs = new ArrayList<>();
+        if (books == null) { this.AllBooksInLibrary = new ArrayList<>(); }
+        else {
+            this.AllBooksInLibrary = books;
+            for (Book book : books) {
+                this.AvailableBookIDs.add(book.bookID); // by default, all books are available
+            }
         }
-        return bookIDs;
-    }
 
-    private List<Integer> getMemberIDs(List<Member> members) { // have to wait for Member implementation
-        if (members == null) return null;
-
-        List<Integer> memberIDs = new ArrayList<>();
-        for (Member member: members) {
-            // memberIDs.add(member.MemberID);
+        this.MemberIDs = new ArrayList<>();
+        if (members != null) {
+            for (Member member: members) {
+                this.MemberIDs.add(member.memberID);
+            }
         }
-        return memberIDs;
     }
 
-    // Book handling
-    // Ordinarily, Member BorrowedBookList would be updated with certain actions (i.e., removeBook, checkoutBook, returnBook, etc)
-    // but strictly following the UML, the library does not appear to require functionality for handling this, so it is not included
+    //--- Book handling
+    // Ordinarily, Member BorrowedBookList would be updated with certain actions 
+    // (i.e., removeBook, checkoutBook, returnBook, etc) but strictly following the UML, the
+    // library does not appear to require functionality for handling this, so it's not included
 
     public void addBook(Book book) {
-        this.AllBooksInLibrary.add(book);
-        this.AvailableBookIds.add(book.bookID);
+        if (book != null) {
+            this.AllBooksInLibrary.add(book);
+            this.AvailableBookIDs.add(book.bookID);
+        }
     }
 
     public void removeBook(Book book) {
         this.AllBooksInLibrary.remove(book);
 
         // handling book removal based on whether it is currently available/loaned
-        if (this.AvailableBookIds.contains(book.bookID)) { // remove from available
-             this.AvailableBookIds.remove(book.bookID);
+        if (this.AvailableBookIDs.contains(book.bookID)) { // remove from available
+             this.AvailableBookIDs.remove(book.bookID);
         }
         else if (this.LoanedBooks.containsKey(book.bookID)) { // remove from loaned
             this.LoanedBooks.remove(book.bookID);
@@ -70,7 +71,6 @@ public class Library {
     }
 
     public void checkoutBook(String bookID, String memberID) {
-        // check if member exists
         if (this.MemberIDs.contains(memberID)) {
             if (this.AvailableBookIDs.contains(bookID)) {
                 this.LoanedBooks.put(bookID, memberID);
@@ -83,10 +83,12 @@ public class Library {
         if (this.MemberIDs.contains(memberID)) {
             if (this.LoanedBooks.get(bookID) == memberID) {
                 this.LoanedBooks.remove(bookID);
+                this.AvailableBookIDs.add(bookID);
             }
         }
     }
 
+    // note: does not check if book even exists in library
     public boolean bookAvailability(String bookID) {
         if (this.AvailableBookIDs.contains(bookID) ) {
             return true;
@@ -96,30 +98,37 @@ public class Library {
         }
     }
 
+    // return bookID associated with name, return null if it doesn't exist
+    // case insensitive
     public String findBookIdByName(String name) {
         for (Book book : this.AllBooksInLibrary) {
-            if (book.getName() == name) return book.bookID;
+            if (book.name.toLowerCase() == name.toLowerCase()) {
+                return book.bookID;
+            }
         }
         return null;
     }
 
-    public String whoHasBook(String bookID) { // may have to adjust based on type of MemberID
+    // return memberID of member who has the book, return null if no one has it
+    public String whoHasBook(String bookID) {
         if (this.LoanedBooks.containsKey(bookID)) {
             return this.LoanedBooks.get(bookID);
         }
         else {
-            return -1;
+            return null;
         }
     }
 
-    // Member handling - may have to adjust based on Member implementation
+    //--- Member handling
 
-    public void addMember(Member member) {   // may also desire overrides for adding using String memberID
-        // this.MemberIDs.add(member.MemberID);
+    public void addMember(Member member) {
+        if (member != null) {
+            this.MemberIDs.add(member.memberID);
+        }
     }
 
     public void revokeMembership(Member member) {
-        // this.MemberIDs.remove(member.MemberID);
+        this.MemberIDs.remove(member.memberID);
     }
 
     public List<String> getAllMembers() { 
