@@ -1,6 +1,7 @@
 package delft;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,19 +16,19 @@ public class BookTesting {
         book = new Book("1984", "George Orwell", 1949, "123456789", "B001", "Dystopian");
     }
 
-    // Specification-based Tests
+    // Specification Tests
 
     @Test
     void testInitialAvailability() {
-        assertTrue(book.isAvailable(), "New book should be available by default");
+        assertTrue(book.checkAvailability(), "New book should be available by default");
     }
 
     @Test
     void testUpdateBookInfo() {
         book.updateBookInfo("Animal Farm", "George Orwell", 1945, "987654321", "Political Fiction");
-        assertEquals("Animal Farm", book.getName());
-        assertEquals(1945, book.getYear());
-        assertEquals("Political Fiction", book.getGenre());
+        assertEquals("Animal Farm", book.name); // Or book.getName() if implemented
+        assertEquals(1945, book.year);
+        assertEquals("Political Fiction", book.genre);
     }
 
     @Test
@@ -40,8 +41,16 @@ public class BookTesting {
 
     @Test
     void testGetBookInfoOutput() {
-        // Just ensure it doesn't crash; actual console output can be tested with System rules (out of scope for now)
+        // Validate no exception is thrown
         assertDoesNotThrow(() -> book.getBookInfo());
+    }
+
+// Property Tests using jqwik
+
+    @Property
+    void testAvailabilityToggleProperty(@ForAll boolean status) {
+        book.setAvailability(status);
+        assertEquals(status, book.checkAvailability());
     }
 
 }
