@@ -24,7 +24,7 @@ public class LibraryTesting {
     // Library(books, members) - populating constructor
     @Test
     void makeLibraryWithNullBooks() { // books are null
-        // make sure book variables aren't initialized as null
+        // make sure book variables aren't initialized as null + variables  initialized appropriately
         Member member = new Member(null, null, null, null);
         List<Member> memberList = new ArrayList<Member>(Arrays.asList(member, member, member));
 
@@ -32,18 +32,25 @@ public class LibraryTesting {
 
         assertEquals(nullBooksLibrary.AvailableBookIDs, new ArrayList<String>());
         assertEquals(nullBooksLibrary.AllBooksInLibrary, new ArrayList<Book>());
+
+        assertEquals(nullBooksLibrary.MemberIDs.size(), 3);
+        assertEquals(nullBooksLibrary.AllMembers, memberList);
     }
 
     @Test
     void makeLibraryWithNullMembers() { // members are null
-        // make sure member variable not initialized as null
+        // make sure member variable not initialized as null + variables initialized appropriately
 
         Book book = new Book(null, null, 0, null, null, null);
         List<Book> bookList = new ArrayList<>(Arrays.asList(book, book, book));
 
         Library nullMembersLibrary = new Library(bookList, null);
+        
+        assertEquals(nullMembersLibrary.AvailableBookIDs.size(), 3);
+        assertEquals(nullMembersLibrary.AllBooksInLibrary, bookList);
 
         assertEquals(nullMembersLibrary.MemberIDs, new ArrayList<String>());
+        assertEquals(nullMembersLibrary.AllMembers, new ArrayList<Member>());
     }
 
     // addBook()
@@ -248,6 +255,7 @@ public class LibraryTesting {
         Member member = new Member(null, null, null, null);
         library.addMember(member);
         assertEquals(library.MemberIDs.size(), 1);
+        assertEquals(library.AllMembers.size(), 1);
     }
 
     @Test
@@ -255,6 +263,7 @@ public class LibraryTesting {
         // should not update library variable
         library.addMember(null);
         assertEquals(library.MemberIDs.size(), 0);
+        assertEquals(library.AllMembers.size(), 0);
     }
 
     @Test
@@ -272,9 +281,11 @@ public class LibraryTesting {
         // ensure library variable updates
         Member member = new Member(null, null, null, null);
         library.MemberIDs.add(member.memberID);
+        library.AllMembers.add(member);
 
         library.revokeMembership(member);
         assertEquals(library.MemberIDs.size(), 0);
+        assertEquals(library.AllMembers.size(), 0);
     }
 
     @Test
@@ -283,18 +294,20 @@ public class LibraryTesting {
         Member member = new Member(null, null, null, null);
         Member nonMember = new Member(null, null, "0", null);
         library.MemberIDs.add(member.memberID);
+        library.AllMembers.add(member);
 
         library.revokeMembership(nonMember);
         assertEquals(library.MemberIDs.size(), 1);
+        assertEquals(library.AllMembers.size(), 1);
     }
 
     // getAllMembers()
     @Test
     void getAllMembers() { // checking the correct variable is retrieved
         Member member = new Member(null, null, null, null);
-        library.MemberIDs.add(member.memberID);
+        library.AllMembers.add(member);
 
-        assertEquals(library.getAllMembers(), library.MemberIDs);
+        assertEquals(library.getAllMembers(), library.AllMembers);
     }
 
     //--- Structural tests

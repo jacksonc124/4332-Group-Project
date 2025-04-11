@@ -41,7 +41,9 @@ public class Library {
         }
 
         this.MemberIDs = new ArrayList<>();
-        if (members != null) {
+        if (members == null) { this.AllMembers = new ArrayList<>(); }
+        else {
+            this.AllMembers = members;
             for (Member member: members) {
                 this.MemberIDs.add(member.memberID);
             }
