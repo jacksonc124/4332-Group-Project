@@ -1,0 +1,7 @@
+
+
+// This file is just to hold the 2 commands needed to run this project.
+// Make sure you're in the 4332_Library directory before running these commands.
+
+// Run "javac -d target/classes src/main/java/delft/*.java" to compile it
+// Then run "java -cp target/classes delft.LibInterface" to boot up the interface

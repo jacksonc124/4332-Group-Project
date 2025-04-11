@@ -9,6 +9,7 @@ public class Library {
     public HashMap<String, String> LoanedBooks; // HashMap of BookID, MemberID
     public List<Book> AllBooksInLibrary;
     public List<String> MemberIDs;
+    public List<Member> AllMembers;
 
     //--- Constructors
 
@@ -18,6 +19,7 @@ public class Library {
         this.AvailableBookIDs = new ArrayList<>();
         this.LoanedBooks = new HashMap<>();
         this.MemberIDs = new ArrayList<>();
+        this.AllMembers = new ArrayList<>();
     }
 
     // populate library w/ existing books & members
@@ -102,7 +104,7 @@ public class Library {
     // case insensitive
     public String findBookIdByName(String name) {
         for (Book book : this.AllBooksInLibrary) {
-            if (book.name.toLowerCase() == name.toLowerCase()) {
+            if (book.name.equalsIgnoreCase(name)) { // Use equalsIgnoreCase for string comparison
                 return book.bookID;
             }
         }
@@ -124,15 +126,17 @@ public class Library {
     public void addMember(Member member) {
         if (member != null && !this.MemberIDs.contains(member.memberID)) {
             this.MemberIDs.add(member.memberID);
+            this.AllMembers.add(member);
         }
     }
 
     public void revokeMembership(Member member) {
         this.MemberIDs.remove(member.memberID);
+        this.AllMembers.remove(member);
     }
 
-    public List<String> getAllMembers() { 
-        return this.MemberIDs;
+    public List<Member> getAllMembers() { 
+        return this.AllMembers;
     }
     
 }
