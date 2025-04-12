@@ -25,6 +25,7 @@ public class Member {
         System.out.println("Name: " + name);
         System.out.println("Email:" + email);
         System.out.println("MemberID:" + memberID);
+        System.out.println("BorrowedBookList: " + BorrowedBookList);
     }
 
     // returns the info of the book list
@@ -34,20 +35,18 @@ public class Member {
 
     // adds the book to the list
     public void addBorrowedBook(Book book) {
-        if (book != null) {
-            this.BorrowedBookList.add(book);
-        }
-
+        this.BorrowedBookList.add(book);
     }
 
     // updates the member's name, email and Member ID
-    public void updateMemberInfo(String name, String email, String memberID) {
+    public void updateMemberInfo(String name, String email, String memberID, List<Book> BorrowedBookList) {
         this.name = name;
         this.email = email;
         this.memberID = memberID;
+        this.BorrowedBookList = BorrowedBookList;
     }
 
-    // removes the spefic book from the list
+    // removes the specfic book from the list
     public void removeBorrowedBook(Book book) {
         this.BorrowedBookList.remove(book);
 
