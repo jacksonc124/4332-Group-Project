@@ -1,5 +1,6 @@
 package delft;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,11 +22,12 @@ public class Member {
     // project methods
 
     // prints out the memberID, name and email
-    public void printMemberInfo() {
-        System.out.println("Name: " + name);
-        System.out.println("Email:" + email);
-        System.out.println("MemberID:" + memberID);
-    }
+public void printMemberInfo(PrintStream out) {
+    out.println("Name: " + name);
+    out.println("Email: " + email);
+    out.println("Member ID: " + memberID);
+}
+
 
     // returns the info of the book list
     public List<Book> getBorrowedbookList() {

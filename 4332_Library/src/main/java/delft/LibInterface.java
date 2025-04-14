@@ -128,7 +128,7 @@ public class LibInterface {
             out.println("No books are currently in the library.");
         } else {
             for (Book book : library.AllBooksInLibrary) {
-                book.getBookInfo();
+                book.getBookInfo(out);
                 // Gotta make the list look pretty.
                 out.println("--------------------");
             }
@@ -188,7 +188,7 @@ public class LibInterface {
         String memberID = scanner.nextLine();
 
         library.addMember(new Member(memberName, email, memberID, null));
-        out.println("New member has beed successfully added.");
+        out.println("New member has been successfully added.");
     }
 
     private void removeMember() {
@@ -294,7 +294,7 @@ public class LibInterface {
             // If the book exist then give all its info.
             if (foundBook != null) {
                 out.println("Book found:");
-                foundBook.getBookInfo();
+                foundBook.getBookInfo(out);
 
                 // If it is availility is true and say that otherwise say who has it.
                 if (foundBook.isAvailable) {
@@ -322,7 +322,7 @@ public class LibInterface {
         } else {
             // This just list all the current members.
             for (Member member : library.getAllMembers()) {
-                member.printMemberInfo();
+                member.printMemberInfo(out);
                 // And this prints their borrowed book list.
                 out.println("Borrowed Books:");
                 if (member.getBorrowedbookList().isEmpty()) {

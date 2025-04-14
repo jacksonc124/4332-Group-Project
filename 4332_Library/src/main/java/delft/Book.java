@@ -1,5 +1,7 @@
 package delft;
 
+import java.io.PrintStream;
+
 public class Book {
     public String name;
     public String author;
@@ -39,14 +41,15 @@ public class Book {
     }
 
     // Book toString
-    public void getBookInfo() {
-        System.out.println("Book ID: " + bookID);
-        System.out.println("Title: " + name);
-        System.out.println("Author: " + author);
-        System.out.println("Year: " + year);
-        System.out.println("ISBN: " + ISBN);
-        System.out.println("Genre: " + genre);
-        System.out.println("Availability: " + (isAvailable ? "Available" : "Not Available"));
-    }
+public void getBookInfo(PrintStream out) {
+    out.println("Title: " + name);
+    out.println("Author: " + author);
+    out.println("Year: " + year);
+    out.println("ISBN: " + ISBN);
+    out.println("Book ID: " + bookID);
+    out.println("Genre: " + genre);
+    out.println("Available: " + (isAvailable ? "Yes" : "No"));
+}
+
 
 }
