@@ -5,3 +5,5 @@
 
 // Run "javac -d target/classes src/main/java/delft/*.java" to compile it
 // Then run "java -cp target/classes delft.LibInterface" to boot up the interface
+
+// If you're on Intellij though just run it with the start button while in the LibInterface.java file.
