@@ -142,9 +142,17 @@ public class LibInterface {
         out.print("Enter author: ");
         String author = scanner.nextLine();
 
-        out.print("Enter year: ");
-        int year = scanner.nextInt();
-        scanner.nextLine();
+        // This is different due to the whole program crashing if you enter a non int for the year and we didn't want that now did we?
+        int year;
+        while (true) {
+            out.print("Enter year: ");
+            try {
+                year = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                out.println("Invalid input. Please enter a valid year as an integer.");
+            }
+        }
 
         out.print("Enter ISBN: ");
         String isbn = scanner.nextLine();
