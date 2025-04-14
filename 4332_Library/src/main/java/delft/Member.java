@@ -25,7 +25,6 @@ public class Member {
         System.out.println("Name: " + name);
         System.out.println("Email:" + email);
         System.out.println("MemberID:" + memberID);
-        System.out.println("BorrowedBookList: " + BorrowedBookList);
     }
 
     // returns the info of the book list

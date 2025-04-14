@@ -20,7 +20,9 @@ public class LibInterface {
             System.out.println("7. Return");
             System.out.println("8. Search for Book");
             System.out.println("9. Full Member List");
-            System.out.println("10. Exit");
+            System.out.println("10. Edit Book Information");
+            System.out.println("11. Edit Member Information");
+            System.out.println("12. Exit");
             System.out.print("Enter your choice: ");
             System.out.print("\n");
 
@@ -107,15 +109,24 @@ public class LibInterface {
                 case 5:
                     System.out.print("Enter current member ID to remove: ");
                     memberID = scanner.nextLine();
-                    Member memberToRemove = library.MemberIDs.contains(memberID)
-                        ? new Member(null, null, memberID, null)
-                        : null;
+            
+                    // Another search
+                    Member memberToRemove = library.getAllMembers().stream()
+                        .filter(member -> member.memberID.equals(memberID))
+                        .findFirst().orElse(null);
+            
                     if (memberToRemove != null) {
-                        // Also revoking their membership.
+                        // This case also needs to return any books that member had.
+                        for (Book book : memberToRemove.getBorrowedbookList()) {
+                        book.isAvailable = true;
+                        library.LoanedBooks.remove(book.bookID);
+                        }
+            
+                        // And finally revoke their membership
                         library.revokeMembership(memberToRemove);
-                        System.out.println("Member removed successfully.");
+                        System.out.println("Member removed successfully, and all borrowed books have been returned.");
                     } else {
-                        System.out.println("Member not found.");
+                       System.out.println("Member not found.");
                     }
                     break;
 
@@ -188,7 +199,7 @@ public class LibInterface {
                     }
                     break;
 
-                    // This case is for searching a book up and displaying its information.
+                // This case is for searching a book up and displaying its information.
                 case 8:
                     // While checkout and return require the book's ID, search will use its name instead.
                     System.out.print("Enter book name to search: ");
@@ -225,7 +236,7 @@ public class LibInterface {
                     }
                     break;
 
-                    // This case is to list all current members and if that member has a booked checked out then list that with them.
+                // This case is to list all current members and if that member has a booked checked out then list that with them.
                 case 9:
                     System.out.println("Members currently in the library:");
                     if (library.getAllMembers().isEmpty()) {
@@ -234,7 +245,7 @@ public class LibInterface {
                         // This just list all the current members.
                         for (Member member : library.getAllMembers()) {
                             member.printMemberInfo();
-                            // And this prints of their borrowed book list.
+                            // And this prints their borrowed book list.
                             System.out.println("Borrowed Books:");
                             if (member.getBorrowedbookList().isEmpty()) {
                                 System.out.println("  No books currently borrowed.");
@@ -249,8 +260,74 @@ public class LibInterface {
                     }
                     break;
                     
-                // This case just deals with exiting out.
+                // This case deals with editing the information of a book.    
                 case 10:
+                    System.out.print("Enter book ID you'd like to edit: ");
+                    bookID = scanner.nextLine();
+                    // Usual search for the book
+                    Book bookToEdit = library.AllBooksInLibrary.stream()
+                        .filter(book -> book.bookID.equals(bookID))
+                        .findFirst().orElse(null);
+                    
+                    // If found then the user is prompted with a series of edits
+                    if (bookToEdit != null) {
+                        System.out.print("Enter new title (leave blank to keep current): ");
+                        String newTitle = scanner.nextLine();
+                        System.out.print("Enter new author (leave blank to keep current): ");
+                        String newAuthor = scanner.nextLine();
+                        System.out.print("Enter new year (leave blank to keep current): ");
+                        String newYear = scanner.nextLine();
+                        System.out.print("Enter new ISBN (leave blank to keep current): ");
+                        String newISBN = scanner.nextLine();
+                        System.out.print("Enter new genre (leave blank to keep current): ");
+                        String newGenre = scanner.nextLine();
+                
+                        // Then it's infromation is updated only if something was actually imputed
+                        bookToEdit.updateBookInfo(
+                            newTitle.isEmpty() ? bookToEdit.name : newTitle,
+                            newAuthor.isEmpty() ? bookToEdit.author : newAuthor,
+                            newYear.isEmpty() ? bookToEdit.year : Integer.parseInt(newYear),
+                            newISBN.isEmpty() ? bookToEdit.ISBN : newISBN,
+                            newGenre.isEmpty() ? bookToEdit.genre : newGenre
+                        );
+                        System.out.println("Book information updated successfully.");
+                    } else {
+                        System.out.println("Book not found.");
+                    }
+                    break;
+
+                // This case deals with editing the information of any memebrs. It works the same as case 10 so its code
+                // is borderline the same as it.
+                case 11:
+                    System.out.print("Enter member ID you'd like to edit: ");
+                    memberID = scanner.nextLine();
+                    Member memberToEdit = library.getAllMembers().stream()
+                        .filter(member -> member.memberID.equals(memberID))
+                        .findFirst()
+                        .orElse(null);
+                
+                    if (memberToEdit != null) {
+                        System.out.print("Enter new name (leave blank to keep current): ");
+                        String newName = scanner.nextLine();
+                        System.out.print("Enter new email (leave blank to keep current): ");
+                        String newEmail = scanner.nextLine();
+                        System.out.print("Enter new member ID (leave blank to keep current): ");
+                        String newMemberID = scanner.nextLine();
+                
+                        memberToEdit.updateMemberInfo(
+                            newName.isEmpty() ? memberToEdit.name : newName,
+                            newEmail.isEmpty() ? memberToEdit.email : newEmail,
+                            newMemberID.isEmpty() ? memberToEdit.memberID : newMemberID,
+                            memberToEdit.getBorrowedbookList()
+                        );
+                        System.out.println("Member information updated successfully.");
+                    } else {
+                        System.out.println("Member not found.");
+                    }
+                    break;
+
+                // This case just deals with exiting out.
+                case 12:
                     System.out.println("Exiting system. Goodbye!");
                     scanner.close();
                     return;
