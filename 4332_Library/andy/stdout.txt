@@ -4,45 +4,46 @@ Andy v0.28-575d45a (2022-05-03T17:35:52+0200)
 Success
 
 --- JUnit execution
-3/3 passed
+4/5 passed
 
---- JaCoCo coverage
-Line coverage: 10/10
-Instruction coverage: 40/40
-Branch coverage: 10/10
+- testAvailabilityToggleProperty:
+{BookTesting:testAvailabilityToggleProperty=
+  java.lang.NullPointerException:
+    Cannot invoke "delft.Book.setAvailability(boolean)" because "this.book" is null
 
---- Mutation testing
-5/5 killed
+                              |--------------------jqwik--------------------
+tries = 1                     | # of calls to property
+checks = 1                    | # of not rejected calls
+generation = EXHAUSTIVE       | parameters are exhaustively generated
+after-failure = PREVIOUS_SEED | use the previous seed
+when-fixed-seed = ALLOW       | fixing the random seed is allowed
+edge-cases#mode = MIXIN       | edge cases are mixed in
+edge-cases#total = 0          | # of all combined edge cases
+edge-cases#tried = 0          | # of edge cases tried in current run
+seed = -323858594156436641    | random seed to reproduce generated values
 
---- Code checks
-No code checks to be assessed
+Sample
+------
+  arg0: true
+}
+You must ensure that all tests are passing! Stopping the assessment.
 
---- Meta tests
-8/8 passed
+--- Console output
+Book ID: B001
+Title: 1984
+Author: George Orwell
+Year: 1949
+ISBN: 123456789
+Genre: Dystopian
+Availability: Available
+
 
 --- Assessment
-Branch coverage: 10/10 (overall weight=0.20)
-Mutation coverage: 5/5 (overall weight=0.35)
+Branch coverage: 0/0 (overall weight=0.20)
+Mutation coverage: 0/0 (overall weight=0.35)
 Code checks: 0/0 (overall weight=0.00)
-Meta tests: 8/8 (overall weight=0.45)
+Meta tests: 0/0 (overall weight=0.45)
 
-Final grade: 100/100
+Final grade: 0/100
 
-           .-"``"-.
-          /______; \
-         {_______}\|
-         (/ a a \)(_)
-         (.-.).-.)
-  _ooo__(    ^    )_____
- /       '-.___.-'      \
-|    Super congrats!     |
- \__________________ooo_/
-         |_  |  _|
-         \___|___/
-         {___|___}
-          |_ | _|
-          /-'Y'-\
-         (__/ \__)
-
-
-Andy is running in PRACTICE mode and took 21.3 seconds to assess your solution.
+Andy is running in PRACTICE mode and took 3.2 seconds to assess your solution.
