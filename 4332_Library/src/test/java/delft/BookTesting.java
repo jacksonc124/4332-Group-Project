@@ -1,4 +1,4 @@
-/*
+
 package delft;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -21,11 +21,13 @@ public class BookTesting {
 
     // Specification Tests
 
+    // Test book's availability once added is always set to true
     @Test
     void testInitialAvailability() {
         assertTrue(book.checkAvailability());
     }
 
+    // Testing changing things about the book are updated properly
     @Test
     void testUpdateBookInfo() {
         book.updateBookInfo("Fahrenheit 451", "Ray Bradbury", 1953, "978-1451673319", "Dystopian");
@@ -34,6 +36,7 @@ public class BookTesting {
         assertEquals("Dystopian", book.genre);
     }
 
+    // Test changing availability of the book
     @Test
     void testSetAvailability() {
         book.setAvailability(false);
@@ -42,54 +45,58 @@ public class BookTesting {
         assertTrue(book.checkAvailability());
     }
 
+    // Test the toString and if it outputs the correct information in the correct order.
     @Test
     void testGetBookInfo() {
+        Book book = new Book("The Martian Chronicles", "Ray Bradbury", 1950, "978-0062079930", "MC001", "Science Fiction");
+
         String expectedOutput = String.join(System.lineSeparator(),
-                "Book ID: MC001",
                 "Title: The Martian Chronicles",
                 "Author: Ray Bradbury",
                 "Year: 1950",
                 "ISBN: 978-0062079930",
+                "Book ID: MC001",
                 "Genre: Science Fiction",
-                "Availability: Available",
-                ""
-        );
+                "Available: Yes"
+        ) + System.lineSeparator(); // Add trailing newline
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(outputStream));
-
-        book.getBookInfo();
-
-        System.setOut(originalOut);
+        book.getBookInfo(new PrintStream(outputStream));
 
         assertEquals(expectedOutput, outputStream.toString());
     }
 
+
+    // Testing alternate book availability in toString
     @Test
     void testGetBookInfoWhenNotAvailable() {
+        Book book = new Book(
+                "The Martian Chronicles",
+                "Ray Bradbury",
+                1950,
+                "978-0062079930",
+                "MC001",
+                "Science Fiction"
+        );
+
+        // Set book as not available
         book.setAvailability(false);
 
+        // Correct line order and formatting
         String expectedOutput = String.join(System.lineSeparator(),
-                "Book ID: MC001",
                 "Title: The Martian Chronicles",
                 "Author: Ray Bradbury",
                 "Year: 1950",
                 "ISBN: 978-0062079930",
+                "Book ID: MC001",
                 "Genre: Science Fiction",
-                "Availability: Not Available",
-                ""
-        );
+                "Available: No"
+        ) + System.lineSeparator();
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        PrintStream originalOut = System.out;
-        System.setOut(new PrintStream(outputStream));
-
-        book.getBookInfo();
-
-        System.setOut(originalOut);
+        book.getBookInfo(new PrintStream(outputStream)); // Pass stream correctly
 
         assertEquals(expectedOutput, outputStream.toString());
     }
+
 }
- */
