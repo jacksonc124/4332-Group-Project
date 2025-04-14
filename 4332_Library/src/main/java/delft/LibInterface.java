@@ -263,29 +263,38 @@ public class LibInterface {
         String bookID = scanner.nextLine();
         out.print("Enter member ID: ");
         String memberID = scanner.nextLine();
+        Book bookToReturn = library.AllBooksInLibrary.stream()
+                .filter(book -> book.bookID.equals(bookID))
+                .findFirst()
+                .orElse(null);
 
-        if (library.bookAvailability(bookID)) {
-            out.println("Book is already available and cannot be returned.");
-        } else if (!library.LoanedBooks.containsKey(bookID) || !library.LoanedBooks.get(bookID).equals(memberID)) {
-            out.println("This book is not loaned to the specified member.");
-        } else {
-            library.returnBook(bookID, memberID);
-            Book bookToReturn = library.AllBooksInLibrary.stream()
-                    .filter(book -> book.bookID.equals(bookID))
-                    .findFirst()
-                    .orElse(null);
-            if (bookToReturn != null) {
-                bookToReturn.isAvailable = true;
-                Member member = library.getAllMembers().stream()
-                        .filter(m -> m.memberID.equals(memberID))
-                        .findFirst()
-                        .orElse(null);
-                if (member != null) {
-                    member.removeBorrowedBook(bookToReturn);
-                }
-            }
-            out.println("Book returned successfully.");
+        if (bookToReturn == null) {
+            out.println("Book not found.");
+            return;
         }
+        if (bookToReturn.isAvailable) {
+            out.println("Book is already available and cannot be returned.");
+            return;
+        }
+
+        // Check if the member exists for testing's sake.
+        Member member = library.getAllMembers().stream()
+                .filter(m -> m.memberID.equals(memberID))
+                .findFirst()
+                .orElse(null);
+
+
+        // Check if the book is loaned to the specified member
+        if (!library.LoanedBooks.containsKey(bookID) || !library.LoanedBooks.get(bookID).equals(memberID)) {
+            out.println("This book is not loaned to the specified member.");
+            return;
+        }
+
+        // Process the return
+        library.returnBook(bookID, memberID);
+        bookToReturn.isAvailable = true;
+        member.removeBorrowedBook(bookToReturn);
+        out.println("Book returned successfully.");
     }
 
     private void searchBook() {
@@ -304,16 +313,13 @@ public class LibInterface {
                 out.println("Book found:");
                 foundBook.getBookInfo(out);
 
-                // If it is availility is true and say that otherwise say who has it.
+                // If it is availablty is set to true and say that otherwise say who has it.
                 if (foundBook.isAvailable) {
                     out.println("The book is currently available.");
                 } else {
                     String borrowerID = library.whoHasBook(foundBook.bookID);
                     if (borrowerID != null) {
                         out.println("Currently checked out by Member ID: " + borrowerID);
-                    } else {
-                        // A little just in case line
-                        out.println("Error: Book is marked as unavailable but no borrower found.");
                     }
                 }
             }
@@ -368,7 +374,7 @@ public class LibInterface {
             out.print("Enter new genre (leave blank to keep current): ");
             String newGenre = scanner.nextLine();
 
-            // Then it's infromation is updated only if something was actually imputed
+            // Then it's information is updated only if something was actually imputed
             bookToEdit.updateBookInfo(
                     newTitle.isEmpty() ? bookToEdit.name : newTitle,
                     newAuthor.isEmpty() ? bookToEdit.author : newAuthor,
