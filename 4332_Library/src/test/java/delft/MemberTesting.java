@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,13 +25,6 @@ public class MemberTesting {
     }
 
     //--- Specification tests
-
-    //tests the print member info to make sure that the object return something
-    @Test
-    void testPrintMemberInfo() {
-        // Validate no exception is thrown
-        //assertDoesNotThrow(() -> member.printMemberInfo());
-    }
 
     //tests the update member info to make sure that the object match
     @Test
@@ -79,5 +75,22 @@ public class MemberTesting {
         assertEquals(books2, member2.BorrowedBookList);
     }
 
+
+    // tests printing out member's info (altered due to printStream change)
+    @Test
+    void testPrintMemberInfo() {
+        Member member = new Member("Alice Smith", "alice@example.com", "M100", null);
+
+        String expectedOutput = String.join(System.lineSeparator(),
+                "Name: Alice Smith",
+                "Email: alice@example.com",
+                "Member ID: M100"
+        ) + System.lineSeparator(); // Always remember the final newline
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        member.printMemberInfo(new PrintStream(outputStream));
+
+        assertEquals(expectedOutput, outputStream.toString());
+    }
 
 }
