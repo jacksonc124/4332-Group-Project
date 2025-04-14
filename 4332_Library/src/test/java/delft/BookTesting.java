@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 import net.jqwik.api.*;
 import net.jqwik.api.constraints.*;
@@ -13,44 +15,79 @@ public class BookTesting {
 
     @BeforeEach
     void setup() {
-        book = new Book("1984", "George Orwell", 1949, "123456789", "B001", "Dystopian");
+        book = new Book("The Martian Chronicles", "Ray Bradbury", 1950, "978-0062079930", "MC001", "Science Fiction");
     }
 
     // Specification Tests
 
     @Test
     void testInitialAvailability() {
-        assertTrue(book.checkAvailability(), "New book should be available by default");
+        assertTrue(book.checkAvailability());
     }
 
     @Test
     void testUpdateBookInfo() {
-        book.updateBookInfo("Animal Farm", "George Orwell", 1945, "987654321", "Political Fiction");
-        assertEquals("Animal Farm", book.name); // Or book.getName() if implemented
-        assertEquals(1945, book.year);
-        assertEquals("Political Fiction", book.genre);
+        book.updateBookInfo("Fahrenheit 451", "Ray Bradbury", 1953, "978-1451673319", "Dystopian");
+        assertEquals("Fahrenheit 451", book.name);
+        assertEquals(1953, book.year);
+        assertEquals("Dystopian", book.genre);
     }
 
     @Test
     void testSetAvailability() {
         book.setAvailability(false);
-        assertFalse(book.checkAvailability(), "Book should be marked as not available");
+        assertFalse(book.checkAvailability());
         book.setAvailability(true);
-        assertTrue(book.checkAvailability(), "Book should be marked as available");
+        assertTrue(book.checkAvailability());
     }
 
     @Test
-    void testGetBookInfoOutput() {
-        // Validate no exception is thrown
-        assertDoesNotThrow(() -> book.getBookInfo());
+    void testGetBookInfo() {
+        String expectedOutput = String.join(System.lineSeparator(),
+                "Book ID: MC001",
+                "Title: The Martian Chronicles",
+                "Author: Ray Bradbury",
+                "Year: 1950",
+                "ISBN: 978-0062079930",
+                "Genre: Science Fiction",
+                "Availability: Available",
+                ""
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        book.getBookInfo();
+
+        System.setOut(originalOut);
+
+        assertEquals(expectedOutput, outputStream.toString());
     }
 
-// Property Tests using jqwik
+    @Test
+    void testGetBookInfoWhenNotAvailable() {
+        book.setAvailability(false);
 
-    @Property
-    void testAvailabilityToggleProperty(@ForAll boolean status) {
-        book.setAvailability(status);
-        assertEquals(status, book.checkAvailability());
+        String expectedOutput = String.join(System.lineSeparator(),
+                "Book ID: MC001",
+                "Title: The Martian Chronicles",
+                "Author: Ray Bradbury",
+                "Year: 1950",
+                "ISBN: 978-0062079930",
+                "Genre: Science Fiction",
+                "Availability: Not Available",
+                ""
+        );
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream originalOut = System.out;
+        System.setOut(new PrintStream(outputStream));
+
+        book.getBookInfo();
+
+        System.setOut(originalOut);
+
+        assertEquals(expectedOutput, outputStream.toString());
     }
-
 }

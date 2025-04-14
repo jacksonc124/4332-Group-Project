@@ -48,4 +48,5 @@ public class Book {
         System.out.println("Genre: " + genre);
         System.out.println("Availability: " + (isAvailable ? "Available" : "Not Available"));
     }
+
 }
