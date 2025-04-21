@@ -1,15 +1,24 @@
 package delft;
 
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
 
 public class LibInterface {
     private final Library library;
     private final Scanner scanner;
     private final PrintStream out;
+    private final Librarians librarians;
+    private final LibraryAccounts accounts;
+    // lists what options require authentication to be used (i.e. only full-time librarians can access)
+    private final ArrayList<Integer> optionNeedsAuthentication = new ArrayList<>(List.of(5, 10, 11, 12));
 
-    public LibInterface(Library library, Scanner scanner, PrintStream out) {
+    // prototype constructor
+    public LibInterface(Library library, Librarians librarians, LibraryAccounts accounts, Scanner scanner, PrintStream out) {
         this.library = library;
+        this.librarians = librarians;
         this.scanner = scanner;
         this.out = out;
     }
@@ -35,6 +44,13 @@ public class LibInterface {
 
             int options = scanner.nextInt();
             scanner.nextLine();
+
+            // prototype functionality - authentication
+            while (optionNeedsAuthentication.contains(options) && !authenticate()) {
+                out.println("Could not perform the action. Please select another option: ");
+                options = scanner.nextInt();
+                scanner.nextLine();
+            }
 
             // For the UI I went with the simple aproach of using switch statements.
             // At first all of the methods were coupled in with the switches but that made it super difficult to test so I split them.
@@ -114,11 +130,30 @@ public class LibInterface {
 
     public static void main(String[] args) {
         Library library = new Library();
+        LibraryAccounts accounts = new LibraryAccounts();
+        Librarians librarians = new Librarians();
         Scanner scanner = new Scanner(System.in);
         PrintStream out = System.out;
 
-        LibInterface libInterface = new LibInterface(library, scanner, out);
+        LibInterface libInterface = new LibInterface(library, librarians, accounts, scanner, out);
         libInterface.run();
+    }
+
+    // prototype func
+    private boolean authenticate() {
+        boolean valid = false;
+        out.println("Please enter your authentication code: ");
+        String code = scanner.nextLine();
+
+        if (librarians.contains(code)) {
+            out.println("Thank you for authenticating. You may proceed with your action.");
+            valid = true;
+        }
+        else {
+            out.println("Authentication failed.");
+        }
+
+        return valid;
     }
 
     private void displayAllBooks() {
@@ -159,6 +194,36 @@ public class LibInterface {
 
         out.print("Enter book ID: ");
         String bookID = scanner.nextLine();
+
+        out.print("Enter genre: ");
+        String genre = scanner.nextLine();
+
+        library.addBook(new Book(name, author, year, isbn, bookID, genre));
+        out.println("Book added successfully.");
+    }
+
+    // overloading for buyBook() - prototype
+    private void addBook(String bookID) {
+        out.print("Enter book name: ");
+        String name = scanner.nextLine();
+
+        out.print("Enter author: ");
+        String author = scanner.nextLine();
+
+        // This is different due to the whole program crashing if you enter a non int for the year and we didn't want that now did we?
+        int year;
+        while (true) {
+            out.print("Enter year: ");
+            try {
+                year = Integer.parseInt(scanner.nextLine());
+                break;
+            } catch (NumberFormatException e) {
+                out.println("Invalid input. Please enter a valid year as an integer.");
+            }
+        }
+
+        out.print("Enter ISBN: ");
+        String isbn = scanner.nextLine();
 
         out.print("Enter genre: ");
         String genre = scanner.nextLine();
@@ -233,6 +298,30 @@ public class LibInterface {
         // Check if the book exists and is available
         if (!library.bookAvailability(bookID)) {
             out.println("Book is not available for checkout or does not exist.");
+            // prototype functionality
+            if (!library.AllBooksInLibrary.contains(bookID)) { // aka no one is loaning book, it just doesn't exist at all
+                if (authenticate()) {
+                    while (true) {
+                        out.println("Would you like to purchase this book?");
+                        out.println("1 - Yes");
+                        out.println("2 - No");
+                        int choice = scanner.nextInt();
+                        switch (choice) {
+                            case 1:
+                                buyBook(bookID);
+                                break;
+                            case 2:
+                                break;
+                            default:
+                                out.println("Please enter a valid option.");
+                        }
+                    }
+                } else {
+                    out.println("Please call a full-time librarian for approval if you would like to purchase this book.");
+                    // nothing else, cause we dont actually care lol
+                }
+
+            } 
         } else if (!library.MemberIDs.contains(memberID)) {
             out.println("Invalid member ID.");
         } else {
@@ -256,6 +345,14 @@ public class LibInterface {
             }
             out.println("Book checked out successfully.");
         }
+    }
+
+    private void buyBook(String bookID) {
+        accounts.buyBook(bookID);
+        // if purchase successful
+        // overloaded function created specifically for situation where user could enter
+        // a different bookID than originally entered. fat thumbs exist
+        addBook(bookID); 
     }
 
     private void returnBook() {
