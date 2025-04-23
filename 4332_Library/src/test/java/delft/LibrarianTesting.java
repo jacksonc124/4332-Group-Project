@@ -1,5 +1,10 @@
 package delft;
 
+import net.jqwik.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 public class LibrarianTesting {
 
  private Librarians librarians;
@@ -56,7 +61,7 @@ public class LibrarianTesting {
 
     @Property
     void testWithdrawSalaryPositive(@ForAll double amount) {
-        // Ensure the salary withdrawal is only allowed for positive amounts
+        // Check the salary withdrawal is only allowed for positive amounts
         if (amount > 0) {
             Librarians librarians = new Librarians();
             String validCode = "373737";  // A valid librarian code
