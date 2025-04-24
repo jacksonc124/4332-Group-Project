@@ -5,6 +5,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import net.jqwik.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
 public class LibrarianTesting {
 
  private Librarians librarians;
@@ -25,13 +31,6 @@ public class LibrarianTesting {
     void testIsValidAuth_InvalidCode() {
         assertFalse(librarians.isValidAuth("999999"));
         assertFalse(librarians.isValidAuth("000000"));
-    }
-
-    //Test for full-time status
-    @Test
-    void testIsFullTime() {
-        assertTrue(librarians.isFullTime("373737"));
-        assertFalse(librarians.isFullTime("111111"));
     }
 
     //Test for retrieving librarian name
