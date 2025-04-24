@@ -1,7 +1,5 @@
 package delft;
 
-import static org.mockito.ArgumentMatchers.booleanThat;
-
 public class LibraryAccounts {
 
     private double cashBalance = 39000;
