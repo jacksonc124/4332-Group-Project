@@ -14,7 +14,9 @@ public class InterfaceTest {
         ByteArrayInputStream in = new ByteArrayInputStream(input.getBytes());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         Library library = new Library();
-        LibInterface cli = new LibInterface(library, new Scanner(in), new PrintStream(out));
+        Librarians librarians = new Librarians();
+        LibraryAccounts accounts = new LibraryAccounts();
+        LibInterface cli = new LibInterface(library, librarians, accounts, new Scanner(in), new PrintStream(out));
         cli.run();
         return out.toString();
     }
