@@ -3,7 +3,6 @@ package delft;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.ArrayList;
 import java.util.List;
 
 public class LibInterface {
@@ -12,13 +11,14 @@ public class LibInterface {
     private final PrintStream out;
     private final Librarians librarians;
     private final LibraryAccounts accounts;
-    // lists what options require authentication to be used (i.e. only full-time librarians can access)
-    private final ArrayList<Integer> optionNeedsAuthentication = new ArrayList<>(List.of(5, 10, 11, 12));
+    // Lists what options require authentication to be used (i.e. only full-time librarians can access)
+    private final ArrayList<Integer> optionNeedsAuthentication = new ArrayList<>(List.of(5, 10, 11));
+    private String authenticationCode;
 
-    // prototype constructor
     public LibInterface(Library library, Librarians librarians, LibraryAccounts accounts, Scanner scanner, PrintStream out) {
         this.library = library;
         this.librarians = librarians;
+        this.accounts = accounts;
         this.scanner = scanner;
         this.out = out;
     }
@@ -45,14 +45,17 @@ public class LibInterface {
             int options = scanner.nextInt();
             scanner.nextLine();
 
-            // prototype functionality - authentication
-            while (optionNeedsAuthentication.contains(options) && !authenticate()) {
-                out.println("Could not perform the action. Please select another option: ");
-                options = scanner.nextInt();
-                scanner.nextLine();
+            // Request authentication if action is restricted
+            while (optionNeedsAuthentication.contains(options) && authenticationCode == null) {
+                authenticationCode = authenticate();    // Store code so if successful, user shouldn't have to reauthenticate this session
+                if (authenticationCode == null) {
+                    out.println("Could not perform the action. Please select another option: ");
+                    options = scanner.nextInt();
+                    scanner.nextLine();
+                }
             }
 
-            // For the UI I went with the simple aproach of using switch statements.
+            // For the UI I went with the simple approach of using switch statements.
             // At first all of the methods were coupled in with the switches but that made it super difficult to test so I split them.
             switch (options) {
                 // I thought it would make sense to have an option to list all books. Like what if you wanna
@@ -63,7 +66,7 @@ public class LibInterface {
 
                 // This is everything needed to added a book. Simply asking the user for info then adding it to library.addBook.
                 case 2:
-                    addBook();
+                    addBook(null, null, -1, null, null, null);
                     break;
 
                 // This case is for removing books. Using the books specific ID to search the list for the matching ID.
@@ -127,7 +130,6 @@ public class LibInterface {
             }
         }
     }
-
     public static void main(String[] args) {
         Library library = new Library();
         LibraryAccounts accounts = new LibraryAccounts();
@@ -139,25 +141,24 @@ public class LibInterface {
         libInterface.run();
     }
 
-    // prototype func
-    private boolean authenticate() {
-        boolean valid = false;
+    // Returns a Librarian's authentication code if it's valid, returns null if invalid
+    private String authenticate() {
         out.println("Please enter your authentication code: ");
         String code = scanner.nextLine();
 
-        if (librarians.contains(code)) {
+        if (librarians.isValidAuth(code)) {
             out.println("Thank you for authenticating. You may proceed with your action.");
-            valid = true;
         }
         else {
             out.println("Authentication failed.");
+            code = null;    // We want to null out anything that's not a valid authentication code
         }
 
-        return valid;
+        return code;
     }
 
     private void displayAllBooks() {
-        // If there are no books say that otherwise print the list.
+        // If there are no books, say that, otherwise print the list.
         out.println("Books currently in the library:");
         if (library.AllBooksInLibrary.isEmpty()) {
             out.println("No books are currently in the library.");
@@ -170,63 +171,48 @@ public class LibInterface {
         }
     }
 
-    private void addBook() {
-        out.print("Enter book name: ");
-        String name = scanner.nextLine();
+    // Modified method from previous version - it now takes in any pre-defined variables and asks for missing variables needed to add book
+    // Pass null for variables that aren't pre-defined, except for year
+    // Pass negative numbers -> year to signal it's not pre-defined, since you can't check for null ints
+    private void addBook(String name, String author, int year, String isbn, String bookID, String genre) {
+        if (name == null) {
+            out.print("Enter book name: ");
+            name = scanner.nextLine();
+        }
 
-        out.print("Enter author: ");
-        String author = scanner.nextLine();
+        if (author == null) {
+            out.print("Enter author: ");
+            author = scanner.nextLine();
+        }
 
-        // This is different due to the whole program crashing if you enter a non int for the year and we didn't want that now did we?
-        int year;
-        while (true) {
-            out.print("Enter year: ");
-            try {
-                year = Integer.parseInt(scanner.nextLine());
-                break;
-            } catch (NumberFormatException e) {
-                out.println("Invalid input. Please enter a valid year as an integer.");
+        
+        if (year < 0) {
+            // This is different due to the whole program crashing if you enter a non int for the year and we didn't want that now did we?
+            while (true) {
+                out.print("Enter year: ");
+                try {
+                    year = Integer.parseInt(scanner.nextLine());
+                    break;
+                } catch (NumberFormatException e) {
+                    out.println("Invalid input. Please enter a valid year as an integer.");
+                }
             }
         }
 
-        out.print("Enter ISBN: ");
-        String isbn = scanner.nextLine();
-
-        out.print("Enter book ID: ");
-        String bookID = scanner.nextLine();
-
-        out.print("Enter genre: ");
-        String genre = scanner.nextLine();
-
-        library.addBook(new Book(name, author, year, isbn, bookID, genre));
-        out.println("Book added successfully.");
-    }
-
-    // overloading for buyBook() - prototype
-    private void addBook(String bookID) {
-        out.print("Enter book name: ");
-        String name = scanner.nextLine();
-
-        out.print("Enter author: ");
-        String author = scanner.nextLine();
-
-        // This is different due to the whole program crashing if you enter a non int for the year and we didn't want that now did we?
-        int year;
-        while (true) {
-            out.print("Enter year: ");
-            try {
-                year = Integer.parseInt(scanner.nextLine());
-                break;
-            } catch (NumberFormatException e) {
-                out.println("Invalid input. Please enter a valid year as an integer.");
-            }
+        if (isbn == null) {
+            out.print("Enter ISBN: ");
+            isbn = scanner.nextLine();
         }
 
-        out.print("Enter ISBN: ");
-        String isbn = scanner.nextLine();
+        if (bookID == null) {
+            out.print("Enter book ID: ");
+            bookID = scanner.nextLine();
+        }
 
-        out.print("Enter genre: ");
-        String genre = scanner.nextLine();
+        if (genre == null) {
+            out.print("Enter genre: ");
+            genre = scanner.nextLine();
+        }
 
         library.addBook(new Book(name, author, year, isbn, bookID, genre));
         out.println("Book added successfully.");
@@ -295,36 +281,55 @@ public class LibInterface {
         out.print("Enter member ID: ");
         String memberID = scanner.nextLine();
 
-        // Check if the book exists and is available
-        if (!library.bookAvailability(bookID)) {
-            out.println("Book is not available for checkout or does not exist.");
-            // prototype functionality
-            if (!library.AllBooksInLibrary.contains(bookID)) { // aka no one is loaning book, it just doesn't exist at all
-                if (authenticate()) {
-                    while (true) {
-                        out.println("Would you like to purchase this book?");
-                        out.println("1 - Yes");
-                        out.println("2 - No");
-                        int choice = scanner.nextInt();
-                        switch (choice) {
-                            case 1:
-                                buyBook(bookID);
-                                break;
-                            case 2:
-                                break;
-                            default:
-                                out.println("Please enter a valid option.");
-                        }
-                    }
-                } else {
-                    out.println("Please call a full-time librarian for approval if you would like to purchase this book.");
-                    // nothing else, cause we dont actually care lol
-                }
+        boolean canCheckout = true;
 
-            } 
-        } else if (!library.MemberIDs.contains(memberID)) {
+        // First check if the member exists - no point allowing checkout or book purchase for a member that doesn't exist
+        if (!library.MemberIDs.contains(memberID)) {
+            canCheckout = false;
             out.println("Invalid member ID.");
-        } else {
+            return;
+        }
+
+        // Now check if the book is available
+        if (!library.bookAvailability(bookID)) {        // Is the book available? If not, it may not exist or is being borrowed
+            canCheckout = false;
+            if (library.whoHasBook(bookID) == null) {   // No one is borrowing book, it doesn't exist in library
+                out.println("The library does not currently own this book.");
+                while (true) {                          // Prompting user for purchase + checkout
+                    out.println("Would you like to purchase this book and proceed to checkout?");
+                    out.println("Enter 1 (yes) or 2 (no)");
+                    int choice = scanner.nextInt();
+                    scanner.nextLine(); // to consume the enter token
+
+                    if (choice == 1) {  // 1 = yes
+                        if (authenticationCode == null) {               // If no authentication on record, allow user to attempt to authenticate
+                            authenticationCode = authenticate();
+                        }
+                        
+                        if (authenticationCode != null) {               // Only full-time librarians are allowed to purchase books
+                            out.print("Enter book name for purchase: ");
+                            String bookName = scanner.nextLine();
+                            canCheckout = buyBook(bookName, bookID);    // Only set to true if purchase was successful
+                        } else {
+                            out.println("Please call a full-time librarian for approval if you would like to purchase this book.");
+                            // Nothing happens here, just informing the user
+                        }
+                        break;
+                    }
+                    else if (choice == 2) { // 2 = no
+                        break;
+                    }
+                    else {
+                        out.println("Please enter a valid option.");
+                    }
+                }
+            }
+            else {
+                out.println("This book is already on loan.");
+            }
+        }
+
+        if (canCheckout) {  // If book is available (not on loan or was just purchased)
             library.checkoutBook(bookID, memberID);
             // Set the book's availability to false after checkout
             Book bookToCheckout = library.AllBooksInLibrary.stream()
@@ -342,17 +347,26 @@ public class LibInterface {
                 if (member != null) {
                     member.addBorrowedBook(bookToCheckout);
                 }
+
+                // Update the Librarian's purchase history 
+                librarians.recordBookPurchase(authenticationCode, bookToCheckout.name);
             }
             out.println("Book checked out successfully.");
         }
     }
 
-    private void buyBook(String bookID) {
-        accounts.buyBook(bookID);
-        // if purchase successful
-        // overloaded function created specifically for situation where user could enter
-        // a different bookID than originally entered. fat thumbs exist
-        addBook(bookID); 
+    // This should only be called after a successful authenticate()
+    // since only full-time librarians are allowed to touch LibraryAccounts (accounts)
+    private boolean buyBook(String bookName, String bookID) {
+        if (accounts.buyBooks(bookName, bookID)) {
+            addBook(bookName, null, -1, null, bookID, null);
+            out.printf("Successfully purchased book: %s\n", bookName);
+            return true;
+        }
+        else {
+            out.printf("Failed to purchase book: %s\n", bookName);
+            return false;
+        }
     }
 
     private void returnBook() {
