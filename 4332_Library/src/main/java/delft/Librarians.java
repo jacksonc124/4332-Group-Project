@@ -7,15 +7,13 @@ public class Librarians
     {
         String name;
         String authCode; //6 Digit auth code
-        boolean isFullTime; //bool that helps interface clarify if full time or not
         double totalSalaryWithdrawn; //total cash withdrawn for salary
         List<String> booksPurchased; //record of books purchased by each librarian
 
-        public Librarian(String name, String authCode, boolean isFullTime) 
+        public Librarian(String name, String authCode)
         {
             this.name = name;
             this.authCode = authCode;
-            this.isFullTime = isFullTime;
             this.totalSalaryWithdrawn = 0.0;
             this.booksPurchased = new ArrayList<>();
         }
@@ -37,23 +35,17 @@ public class Librarians
     {
         librarianMap = new HashMap<>();
         // Three full-time librarians (pre defined)
-        librarianMap.put("373737", new Librarian("Janice", "373737", true));
-        librarianMap.put("234567", new Librarian("Marty", "234567", true));
-        librarianMap.put("162813", new Librarian("John", "162813", true));
+        librarianMap.put("373737", new Librarian("Janice", "373737"));
+        librarianMap.put("234567", new Librarian("Marty", "234567"));
+        librarianMap.put("162813", new Librarian("John", "162813"));
         // Example part-time librarian
-        librarianMap.put("111111", new Librarian("Eve (Part-Time)", "111111", false));
+        librarianMap.put("111111", new Librarian("Eve (Part-Time)", "111111"));
     }
 
     //checks if librarian exists based on code in hashmap
     public boolean isValidAuth(String code) 
     {
         return librarianMap.containsKey(code);
-    }
-
-    //returns if librarian based upon code is full time or not
-    public boolean isFullTime(String code) 
-    {
-        return librarianMap.containsKey(code) && librarianMap.get(code).isFullTime;
     }
 
     //returns librarian name from code
