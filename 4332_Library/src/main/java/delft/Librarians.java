@@ -38,8 +38,6 @@ public class Librarians
         librarianMap.put("373737", new Librarian("Janice", "373737"));
         librarianMap.put("234567", new Librarian("Marty", "234567"));
         librarianMap.put("162813", new Librarian("John", "162813"));
-        // Example part-time librarian
-        librarianMap.put("111111", new Librarian("Eve (Part-Time)", "111111"));
     }
 
     //checks if librarian exists based on code in hashmap
