@@ -309,7 +309,7 @@ public class LibInterface {
                         if (authenticationCode != null) {               // Only full-time librarians are allowed to purchase books
                             out.print("Enter book name for purchase: ");
                             String bookName = scanner.nextLine();
-                            canCheckout = buyBook(bookName, bookID);    // Only set to true if purchase was successful
+                            canCheckout = buyBook(bookName);    // Only set to true if purchase was successful
                         } else {
                             out.println("Please call a full-time librarian for approval if you would like to purchase this book.");
                             // Nothing happens here, just informing the user
@@ -357,9 +357,9 @@ public class LibInterface {
 
     // This should only be called after a successful authenticate()
     // since only full-time librarians are allowed to touch LibraryAccounts (accounts)
-    private boolean buyBook(String bookName, String bookID) {
-        if (accounts.buyBooks(bookName, bookID)) {
-            addBook(bookName, null, -1, null, bookID, null);
+    private boolean buyBook(String bookName) {
+        if (accounts.buyBooks(bookName)) {
+            addBook(bookName, null, -1, null, null, null);
             out.printf("Successfully purchased book: %s\n", bookName);
             return true;
         }
