@@ -38,9 +38,9 @@ public class LibraryAccounts {
     // Attempts to purchase a book using its ID
     // Returns true if the purchase succeeds and balance is sufficient
     // Returns false if book ID is null or funds are insufficient
-    public boolean buyBooks(String bookID) {
-        if (bookID != null) {
-            double bookCost = purchasing.processPurchase(bookID);
+    public boolean buyBooks(String bookTitle) {
+        if (bookTitle != null) {
+            double bookCost = purchasing.processPurchase(bookTitle);
             if (cashBalance >= bookCost) {
                 cashBalance -= bookCost;
                 return true;
@@ -49,7 +49,7 @@ public class LibraryAccounts {
                 return false;
             }
         } else {
-            System.out.println("Book ID is needed to buy books");
+            System.out.println("Book Title is needed to buy books");
             return false;
         }
     }

@@ -36,7 +36,7 @@ public class LibrarianAccountsTesting {
     }
 
     @Test
-    void nullBookIDTest() {
+    void nullBookTitleTest() {
         assertFalse(account.buyBooks(null));
         assertEquals(39000, account.getCashBalance());
     }
