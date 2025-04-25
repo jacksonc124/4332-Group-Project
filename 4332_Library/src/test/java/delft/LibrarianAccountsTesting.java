@@ -12,41 +12,45 @@ public class LibrarianAccountsTesting {
 
     private LibraryAccounts account;
 
-    //Set up before each test
+    // Set up before each test
     @BeforeEach
     void setUp() {
         account = new LibraryAccounts();
     }
 
-    //Cash is correctly added to the balance
+    // Specification-based testing
+
+    // Cash is correctly added to the balance
     @Test
     void AddCashTest() {
         account.addCashBalance(100);
         assertEquals(39100, account.getCashBalance());
     }
 
-    //Withdrawal succeeds when balance is sufficient
+    // Withdrawal succeeds when balance is sufficient
     @Test
     void ValidFundsWithdrawSalaryTest() {
         assertTrue(account.withdrawSalary(5000));
         assertEquals(34000, account.getCashBalance());
     }
 
-    //Withdrawal fails when balance is insufficient
+    // Withdrawal fails when balance is insufficient
     @Test
     void InvalidFundsWithdrawSalaryTest() {
         assertFalse(account.withdrawSalary(40000));
         assertEquals(39000, account.getCashBalance());
     }
 
-    //Buying a book fails if the book title is null
+    // Buying a book fails if the book title is null
     @Test
     void nullBookTitleTest() {
         assertFalse(account.buyBooks(null));
         assertEquals(39000, account.getCashBalance());
     }
 
-    //Book purchase succeeds with valid title and sufficient funds
+    // Test Doubles-> Mocks
+
+    // Book purchase succeeds with valid title and sufficient funds
     @Test
     void BuyBookValidFundsTest() {
         Purchasing Purchase = mock(Purchasing.class);
@@ -75,6 +79,5 @@ public class LibrarianAccountsTesting {
         assertEquals(39000, testAccount.getCashBalance(), 0.01);
         verify(Purchase).processPurchase("EXPENSIVE");
     }
-
 
 }
