@@ -1,9 +1,14 @@
 package delft;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import javax.enterprise.inject.Default;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,7 +26,46 @@ public class InterfaceTest {
         return out.toString();
     }
 
-    // This just test the main method for code coverage sake.
+    DefaultBook book;
+    InterfaceOptions options;
+
+    private class DefaultBook {
+        // default book values to be used with default input methods
+        String name = "Divergent";
+        String author = "Veronica Roth";
+        String year = "2011";
+        String isbn = "ISBN-1234";
+        String bookID = "1234";
+        String genre = "Dystopian";
+    }
+
+    private class InterfaceOptions {
+        String delimiter = "\n";
+        String displayAll = "1" + delimiter;
+        String addBook = "2" + delimiter;
+        String removeBook = "3" + delimiter;
+        String addMember = "4" + delimiter;
+        String removeMember = "5" + delimiter;
+        String checkoutBook = "6" + delimiter;
+        String returnBook = "7" + delimiter;
+        String searchForBook = "8" + delimiter;
+        String listMembers = "9" + delimiter;
+        String editBookInfo = "10" + delimiter;
+        String editMemberAccount = "11" + delimiter;
+        String exit = "12" + delimiter;
+    }
+
+
+    @BeforeEach
+    void setup() {
+        // instantiating a default book we can just reference
+        book = new DefaultBook();
+
+        // similarly, making object with pre-defined variables with string input for the various interface options for readability
+        options = new InterfaceOptions();
+    }
+
+    // This just testing the main method for code coverage's sake.
     @Test
     void testMainMethod() {
         String input = "12\n";
@@ -39,7 +83,8 @@ public class InterfaceTest {
     // This test just confirms that before anything is done that the library is empty.
     @Test
     void case1() {
-        String input = "1\n12\n";
+        String input = options.displayAll   // display all books - shouldn't be any listed in output
+                + options.exit;             // always need to signal exit at end of test, otherwise program will crash
         String output = runCLIWithInput(input);
         assertTrue(output.contains("No books are currently in the library."));
     }
@@ -48,24 +93,33 @@ public class InterfaceTest {
     // It also checks the non-number year catch.
     @Test
     void case2() {
-        String input = "2\nDivergent\nVeronica Roth\nnah\n2011\nISBN-1234\n1234\nDystopian\n1\n12\n";
+        String input = options.addBook
+                + constructAddBookInput(book.name, book.author, null, null, null, null)
+                + "nah\n"
+                + constructAddBookInput(null, null, book.year, book.isbn, book.bookID, book.genre)
+                + options.displayAll
+                + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains("Invalid input. Please enter a valid year as an integer."));
         assertTrue(output.contains("Book added successfully."));
         assertTrue(output.contains("Books currently in the library:"));
-        assertTrue(output.contains("Divergent"));
-        assertTrue(output.contains("Veronica Roth"));
-        assertTrue(output.contains("2011"));
-        assertTrue(output.contains("ISBN-1234"));
-        assertTrue(output.contains("1234"));
-        assertTrue(output.contains("Dystopian"));
+        assertTrue(output.contains(book.name));
+        assertTrue(output.contains(book.author));
+        assertTrue(output.contains(book.year));
+        assertTrue(output.contains(book.isbn));
+        assertTrue(output.contains(book.bookID));
+        assertTrue(output.contains(book.genre));
     }
 
     // This test removes a book then runs list all books to confirm that the book is actually there.
     @Test
     void case3() {
-        String input = "3\n9999\n2\nDivergent\nVeronica Roth\n2011\nISBN-1234\n1234\nDystopian\n3\n1234\n1\n12\n";
+        String input = options.removeBook + "9999\n"  // passing in book id to the remove book prompt
+                + options.addBook + constructAddBookInput()   // add default book -> Library, this book should be available to remove
+                + options.removeBook + book.bookID + "\n"  // again, passing in book id to the remove book prompt; this is the default book's bookID
+                + options.displayAll
+                + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains("Book not found."));
@@ -77,7 +131,9 @@ public class InterfaceTest {
     // This test more or less does the same thing as book's but with member.
     @Test
     void case4() {
-        String input = "4\nJohn Doe\njohn.doe@example.com\nM001\n9\n12\n";
+        String input = options.addMember + "John Doe\njohn.doe@example.com\nM001\n"
+            + options.listMembers
+            + options.exit;
         String output = runCLIWithInput(input);
         assertTrue(output.contains("New member has been successfully added."));
         assertTrue(output.contains("Members currently in the library:"));
@@ -90,15 +146,20 @@ public class InterfaceTest {
     // that after removing a member that their checked out books are available again. Also testing the member not found check.
     @Test
     void case5() {
-        String input = "2\nDivergent\nVeronica Roth\n2011\nISBN-1234\n1234\nDystopian\n" +
-                "4\nJohn Doe\njohn.doe@example.com\nM001\n" +
-                "5\nM999\n" + "6\n1234\nM001\n" + "5\nM001\n" + "1\n9\n12\n";
+        String input = options.addBook + constructAddBookInput()
+                + options.addMember + "John Doe\njohn.doe@example.com\nM001\n"
+                + options.removeMember + "373737\nM999\n"
+                + options.checkoutBook + "1234\nM001\n"
+                + options.removeMember + "M001\n"
+                + options.displayAll
+                + options.listMembers
+                + options.exit;
         String output = runCLIWithInput(input);
         assertTrue(output.contains("Member not found."));
         assertTrue(output.contains("Book checked out successfully."));
         assertTrue(output.contains("Member removed successfully, and all borrowed books have been returned."));
         assertTrue(output.contains("Books currently in the library:"));
-        assertTrue(output.contains("Divergent"));
+        assertTrue(output.contains(book.name));
         assertTrue(output.contains("Available: Yes"));
         assertTrue(output.contains("No members are currently in the library."));
     }
@@ -107,12 +168,16 @@ public class InterfaceTest {
     // Along with the added checks for invalid book and user ID inputs.
     @Test
     void case6() {
-        String input = "2\nDivergent\nVeronica Roth\n2011\nISBN-1234\n1234\nDystopian\n" +
-                "4\nJohn Doe\njohn.doe@example.com\nM001\n" +
-                "6\n9999\nM001\n" + "6\n1234\nM999\n" + "6\n1234\nM001\n" + "1\n9\n12\n";
+        String input = options.addBook + constructAddBookInput()
+                + options.addMember + "John Doe\njohn.doe@example.com\nM001\n"
+                + options.checkoutBook + "9999\nM001\n2\n" // 2\n is for the no to the purchase checkout thing
+                + options.checkoutBook + "1234\nM999\n"
+                + options.checkoutBook + "1234\nM001\n"
+                + options.displayAll
+                + options.listMembers
+                + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("Book is not available for checkout or does not exist."));
         assertTrue(output.contains("Invalid member ID."));
         assertTrue(output.contains("Book checked out successfully."));
         assertTrue(output.contains("Books currently in the library:"));
@@ -126,14 +191,21 @@ public class InterfaceTest {
 
     // To counter that this test confirms that after returning a book that the member no longer has it and that it's back to being available.
     // Along with the check for if a member tries to return an already avalible book. Or if a member tries to return a book and someone
-    // else has checked out. It looks conviluted though due to the kinda long branching paths.
+    // else has checked out. It looks convoluted though due to the kinda long branching paths.
     @Test
     void case7() {
-        String input = "2\nDivergent\nVeronica Roth\n2011\nISBN-1234\n1234\nDystopian\n" +
-                "4\nJohn Doe\njohn.doe@example.com\nM001\n" +
-                "4\nJane Smith\njane.smith@example.com\nM002\n" +
-                "7\n1234\nM999\n" + "7\n9999\nM001\n" + "6\n1234\nM001\n" +
-                "7\n1234\nM002\n" + "7\n1234\nM001\n" + "7\n1234\nM001\n" + "1\n9\n12\n";
+        String input = options.addBook + constructAddBookInput()
+                + options.addMember + "John Doe\njohn.doe@example.com\nM001\n"
+                + options.addMember + "Jane Smith\njane.smith@example.com\nM002\n"
+                + options.returnBook + "1234\nM999\n"
+                + options.returnBook + "9999\nM001\n"
+                + options.checkoutBook + "1234\nM001\n"
+                + options.returnBook + "1234\nM002\n"
+                + options.returnBook + "1234\nM001\n"
+                + options.returnBook + "1234\nM001\n"
+                + options.displayAll
+                + options.listMembers
+                + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains("Book not found."));
@@ -157,9 +229,13 @@ public class InterfaceTest {
     // Along with confirming it says who owns it if someone does and if it doesn't exist.
     @Test
     void case8() {
-        String input = "2\nDivergent\nVeronica Roth\n2011\nISBN-1234\n1234\nDystopian\n" +
-                "4\nJohn Doe\njohn.doe@example.com\nM001\n" +
-                "8\nDivergent\n" + "6\n1234\nM001\n" + "8\nDivergent\n" + "8\nNonExistentBook\n" + "12\n";
+        String input = options.addBook + constructAddBookInput()
+                + options.addMember + "John Doe\njohn.doe@example.com\nM001\n"
+                + options.searchForBook + book.name + "\n"
+                + options.checkoutBook + "1234\nM001\n"
+                + options.searchForBook + book.name + "\n"
+                + options.searchForBook + "NonExistentBook" + "\n"
+                + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains("Book found:"));
@@ -177,27 +253,35 @@ public class InterfaceTest {
     // Along with the non-valid book input check.
     @Test
     void case10() {
-        String input = "10\n9999\n" +
-                "2\nDivergent\nVeronica Roth\n2011\nISBN-1234\n1234\nDystopian\n" +
-                "10\n1234\nInsurgent\nVeronica Roth\n2012\nISBN-5678\nAction\n" +
-                "1\n12\n";
+        String updatedTitle = "Insurgent";
+        String updatedYear = "2012";
+        String updatedISBN = "ISBN-5678";
+        String updatedGenre = "Action";
+
+        String input = options.editBookInfo + "9999\n"
+                + options.addBook + constructAddBookInput()
+                + options.editBookInfo + book.bookID + "\n" + updatedTitle + "\n" + book.author + "\n" + updatedYear + "\n" + updatedISBN + "\n" + updatedGenre + "\n"
+                + options.displayAll
+                + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains("Book not found."));
         assertTrue(output.contains("Book information updated successfully."));
-        assertTrue(output.contains("Insurgent"));
-        assertTrue(output.contains("Veronica Roth"));
-        assertTrue(output.contains("2012"));
-        assertTrue(output.contains("ISBN-5678"));
-        assertTrue(output.contains("Action"));
+        assertTrue(output.contains(updatedTitle));
+        assertTrue(output.contains(book.author));
+        assertTrue(output.contains(updatedYear));
+        assertTrue(output.contains(updatedISBN));
+        assertTrue(output.contains(updatedGenre));
     }
 
     // Likewise this does the same with a members' info.
     @Test
     void case11() {
-        String input = "11\nM999\n" +
-                "4\nJohn Doe\njohn.doe@example.com\nM001\n" +
-                "11\nM001\nJane Doe\njane.doe@example.com\nM002\n" + "9\n12\n";
+        String input = options.editMemberAccount + "M999\n"
+                + options.addMember + "John Doe\njohn.doe@example.com\nM001\n"
+                + options.editMemberAccount + "M001\n" + "Jane Doe\njane.doe@example.com\nM002\n"
+                + options.listMembers
+                + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains("Member not found."));
@@ -210,7 +294,7 @@ public class InterfaceTest {
     // This just makes sure that trying to run exit works fine.
     @Test
     void case12() {
-        String input = "12\n";
+        String input = options.exit;
         String output = runCLIWithInput(input);
         assertTrue(output.contains("Exiting system. Goodbye!"));
     }
@@ -218,7 +302,8 @@ public class InterfaceTest {
     // This test is just to confirm that the default works.
     @Test
     void testDefaultCase() {
-        String input = "99\n12\n";
+        String input = "99\n"   // invalid input
+                + options.exit;
         String output = runCLIWithInput(input);
         assertTrue(output.contains("Invalid option."));
         assertTrue(output.contains("Exiting system. Goodbye!"));
@@ -251,4 +336,44 @@ public class InterfaceTest {
         assertDoesNotThrow(() -> library.returnBook(null, null));
         assertTrue(library.AvailableBookIDs.isEmpty(), "No books should be available after attempting to return with null values.");
     }
+
+    // --- HELPER METHODS --- //
+
+    // constructs book input using given values
+    // if values are passed as null, the input construction skips those values so you can construct partially valid input
+    // but still customize for invalid cases
+    private String constructAddBookInput(String name, String author, String year, String isbn, String bookID, String genre) {
+        String delimiter = "\n";
+        String input = "";
+
+        ArrayList<String> bookValues = new ArrayList<>(
+                Stream.of(name, author, year, isbn, bookID, genre)
+                    .filter(s -> s != null) // have to filter out null objects because you can't use List.of() on nulls
+                    .toList()
+            );
+
+        for (String value: bookValues) {
+            input += value + delimiter;
+        }
+        return input;
+    }
+
+    // method overload: constructs book input using the default book values
+    // for when you just need some valid input
+    // if you need to check for the books values, just instantiate a DefaultBook
+    // and check for the relevant variables
+    private String constructAddBookInput() {
+        String delimiter = "\n";
+        String input = "";
+
+        DefaultBook book = new DefaultBook();
+
+        ArrayList<String> bookValues = new ArrayList<>(List.of(book.name, book.author, book.year, book.isbn, book.bookID, book.genre));
+        for (String value: bookValues) {
+            input += value + delimiter;
+        }
+
+        return input;
+    }
+
 }

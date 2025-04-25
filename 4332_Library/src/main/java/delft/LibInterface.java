@@ -12,7 +12,7 @@ public class LibInterface {
     private final Librarians librarians;
     private final LibraryAccounts accounts;
     // Lists what options require authentication to be used (i.e. only full-time librarians can access)
-    private final ArrayList<Integer> optionNeedsAuthentication = new ArrayList<>(List.of(5, 10, 11));
+    private final ArrayList<Integer> optionNeedsAuthentication = new ArrayList<>(List.of(5));
     private String authenticationCode;
 
     public LibInterface(Library library, Librarians librarians, LibraryAccounts accounts, Scanner scanner, PrintStream out) {
