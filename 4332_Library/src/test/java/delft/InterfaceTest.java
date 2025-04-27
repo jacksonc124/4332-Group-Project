@@ -582,6 +582,29 @@ public class InterfaceTest {
         assertFalse(output.contains(bookCheckedOut()));
     }
 
+    // Tests that after first check out, a book cannot be checked out by a different person
+    @Test
+    void cannotCheckoutABookAlreadyCheckedOut() {
+        String otherMemberName = "Jane Smith";
+        String otherMemberEmail = "jane.smith@example.com";
+        String otherMemberMemberID = "M002";
+
+        String input = options.addMember + constructMemberInput()   // add default member
+                + options.addMember + constructMemberInput(otherMemberName, otherMemberEmail, otherMemberMemberID)  // add another member
+                + options.addBook + constructBookInput()    // add default book
+                + options.checkoutBook + book.bookID + "\n" + member.memberID + "\n"    // checkout default book -> default member
+                + options.checkoutBook + book.bookID + "\n" + otherMemberMemberID + "\n"    // try to check out default book -> other member
+                + options.searchForBook + book.name + "\n"    // so we can verify book is still checked out to default member
+                + options.exit;
+
+        String output = runCLIWithInput(input);
+
+        // [search book] checks: make sure book is checked out by default member, not the other member
+        assertTrue(output.contains(searchedBookCheckedOutBy(member.memberID)));
+        assertFalse(output.contains(searchedBookCheckedOutBy(otherMemberMemberID)));
+    }
+
+
     // --- HELPER METHODS --- //
 
     // Constructs book input using given values
