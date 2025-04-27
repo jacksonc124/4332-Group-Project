@@ -424,7 +424,7 @@ public class LibInterface {
                 out.println("Book found:");
                 foundBook.getBookInfo(out);
 
-                // If it is availablty is set to true and say that otherwise say who has it.
+                // If it is, availability is set to true and say that otherwise say who has it.
                 if (foundBook.isAvailable) {
                     out.println("The book is currently available.");
                 } else {
