@@ -14,6 +14,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class InterfaceTest {
 
+    // Helper method that returns output stream from program for assertion purposes
+    // and so output can be verified
     private String runCLIWithInput(String input) {
         // This is used to more or less fake a stream of inputs going through the cases.
         ByteArrayInputStream in = new ByteArrayInputStream(input.getBytes());
@@ -75,7 +77,7 @@ public class InterfaceTest {
         options = new InterfaceOptions();
     }
 
-    // This is just testing the main method for code coverage's sake.
+    // This is just testing the main method for code coverage's sake. (structural)
     @Test
     void testMainMethod() {
         String input = options.exit;
@@ -109,7 +111,7 @@ public class InterfaceTest {
     }
 
     // This test adds a book then runs list all books to confirm that the book is actually there.
-    // It also checks the non-number year catch.
+    // It also checks the non-number year catch. (specification)
     @Test
     void libraryContainsAddedBook() {
         String input = options.addBook
@@ -136,7 +138,7 @@ public class InterfaceTest {
         assertFalse(output.contains(booksInLibrary(false)));
     }
 
-    // This test adds, then removes a book then runs list all books to confirm that the book is no longer there
+    // This test adds, then removes a book then runs list all books to confirm that the book is no longer there (specification)
     @Test
     void libraryDoesNotContainRemovedBook() {
         String invalidBookID = "9999";
@@ -162,7 +164,7 @@ public class InterfaceTest {
         assertFalse(output.contains(book.name));    // an additional check to make sure that book attributes aren't displayed
     }
 
-    // This test adds a member then runs list all members to confirm the member was added.
+    // This test adds a member then runs list all members to confirm the member was added. (specification)
     @Test
     void libraryContainsAddedMember() {
         String input = options.addMember + constructMemberInput()   // add default member
@@ -183,7 +185,7 @@ public class InterfaceTest {
     }
 
     // Add, then remove a member, using list all members to verify they were removed. Also tests that removing a member
-    // makes their checked out books available again. Also tests the member not found check.
+    // makes their checked out books available again. Also tests the member not found check. (specification)
     @Test
     void libraryDoesNotContainRemovedMember() {
         String invalidMemberID = "M999";
@@ -218,7 +220,7 @@ public class InterfaceTest {
     }
 
     // This test checks out a book and confirms that it's no longer available and that it's checked out by John Doe.
-    // Along with the added checks for invalid book and user ID inputs.
+    // Along with the added checks for invalid book and user ID inputs. (specification)
     @Test
     void checkoutBookAndCheckAvailability() {
         String invalidBookID = "9999";
@@ -256,7 +258,7 @@ public class InterfaceTest {
 
     // To counter that this test confirms that after returning a book that the member no longer has it and that it's back to being available.
     // Along with the check for if a member tries to return an already available book. Or if a member tries to return a book and someone
-    // else has checked out. It looks convoluted though due to the kinda long branching paths.
+    // else has checked out. It looks convoluted though due to the kinda long branching paths. (specification)
     @Test
     void checkoutAndReturnBookAndCheckAvailability() {
         String otherMemberName = "Jane Smith";
@@ -308,7 +310,7 @@ public class InterfaceTest {
     }
 
     // This test just confirms that Divergent was found when searching for it.
-    // Along with confirming it says who owns it if someone does and if it doesn't exist.
+    // Along with confirming it says who owns it if someone does and if it doesn't exist. (specification)
     @Test
     void searchForBookAndCheckAvailability() {
         String invalidBookName = "NonExistentBook";
@@ -336,7 +338,7 @@ public class InterfaceTest {
     // Case 9's core features (list members) get tested in other test so it's not needed here.
 
     // This test confirms that after adding a book and changing it that its info was actually changed.
-    // Along with the non-valid book input check.
+    // Along with the non-valid book input check. (specification)
     @Test
     void checkBookInfoUpdates() {
         String updatedTitle = "Insurgent";
@@ -372,7 +374,7 @@ public class InterfaceTest {
     }
 
     // Like above, this test confirms that after adding a member and changing it that its info was actually changed.
-    // Along with the non-valid member input check.
+    // Along with the non-valid member input check. (specification)
     @Test
     void checkMemberInfoUpdates() {
         String updatedName = "Jane Smith";
@@ -403,7 +405,7 @@ public class InterfaceTest {
         assertFalse(output.contains(member.memberID));
     }
 
-    // This just makes sure that trying to run exit works fine.
+    // This just makes sure that trying to run exit works fine. (specification)
     @Test
     void exitOptionWorks() {
         String input = options.exit;
@@ -412,7 +414,8 @@ public class InterfaceTest {
         assertTrue(output.contains(systemExit()));
     }
 
-    // This test is just to confirm that the default switch case works, i.e. that entering invalid input gives an error message.
+    // This test is just to confirm that the default switch case works, 
+    // i.e. that entering invalid input gives an error message. (specification)
     @Test
     void testDefaultCase() {
         String invalidOption = "99";
@@ -425,7 +428,7 @@ public class InterfaceTest {
         assertTrue(output.contains(systemExit()));
     }
 
-    // These are just a series of all around null test.
+    // These are just a series of all around null test. (specification)
     @Test
     void testNullChecks() {
         Library library = new Library();
@@ -455,7 +458,8 @@ public class InterfaceTest {
 
     // --- PROJECT 2 NEW TESTS --- //
 
-    // This tests that attempting a restricted action (remove a member) & failing authentication does not allow you to remove a member.
+    // This tests that attempting a restricted action (remove a member) & 
+    // failing authentication does not allow you to remove a member. (specification)
     @Test
     void authenticationFailDoesNotAllowAction() {
         String invalidAuthCode = "999999";
@@ -479,7 +483,8 @@ public class InterfaceTest {
         assertFalse(output.contains(membersInLibrary(false)));
     }
 
-    // This tests that attempting a restricted action (remove a member) and passing authentication allows you to complete the action.
+    // This tests that attempting a restricted action (remove a member) and 
+    // passing authentication allows you to complete the action. (specification)
     @Test
     void authenticationSuccessAllowsAction() {
         String validAuthCode = "373737";
@@ -504,7 +509,7 @@ public class InterfaceTest {
     }
 
     // Tests that attempting to check out a non-existent book prompts for purchase & allows checkout when
-    // authenticating successfully.
+    // authenticating successfully. (specification)
     @Test
     void fulltimeLibrarianCanBuyBookForCheckout() {
         String validAuthCode = "373737";
@@ -532,7 +537,7 @@ public class InterfaceTest {
     }
 
     // Tests that attempting to check out a non-existent book prompts for purchase & prevents it
-    // when failing authentication
+    // when failing authentication (specification)
     @Test
     void parttimeLibrarianCannotBuyBookForCheckout() {
         String invalidAuthCode = "999999";
@@ -558,7 +563,7 @@ public class InterfaceTest {
     }
 
     // Tests that attempting to check out a non-existent book prompts for purchase & that it doesn't
-    // force purchase if you say no. Also tests that the invalid option check works.
+    // force purchase if you say no. Also tests that the invalid option check works. (specification)
     @Test
     void checkoutBookDoesNotForcePurchase() {
         String invalidOption = "3";
@@ -582,7 +587,7 @@ public class InterfaceTest {
         assertFalse(output.contains(bookCheckedOut()));
     }
 
-    // Tests that after first check out, a book cannot be checked out by a different person
+    // Tests that after first check out, a book cannot be checked out by a different person (structural - was missing from specification)
     @Test
     void cannotCheckoutABookAlreadyCheckedOut() {
         String otherMemberName = "Jane Smith";
