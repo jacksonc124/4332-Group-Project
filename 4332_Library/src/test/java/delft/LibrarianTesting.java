@@ -4,6 +4,7 @@ import net.jqwik.api.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import net.jqwik.api.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ public class LibrarianTesting {
         assertTrue(librarians.isValidAuth("234567"));
     }
 
+  //Testing codes that are not members of the librarians.
     @Test
     void testIsValidAuth_InvalidCode() {
         assertFalse(librarians.isValidAuth("999999"));
@@ -86,6 +88,7 @@ public class LibrarianTesting {
         }
     }
 
+   //test Librarian purchasing ability.
     @Property
     void testBookPurchase(@ForAll("bookTitles") String bookTitle) {
         // Ensure that a librarian can purchase any book title
@@ -100,5 +103,14 @@ public class LibrarianTesting {
     Arbitrary<String> bookTitles() {
         return Arbitraries.strings().alpha().ofMinLength(3).ofMaxLength(50);  // Random book titles
     }
+
+    //Mock (Test Doubles)
+    @Test
+    void testRecordSalary_Mock() {
+    Librarians mockLibrarians = mock(Librarians.class);
+    mockLibrarians.recordSalary("373737", 1000.0);
+
+    verify(mockLibrarians).recordSalary("373737", 1000.0);
+}
 
 }
