@@ -514,7 +514,7 @@ public class InterfaceTest {
                 + "1" + "\n" // purchase prompt takes 1 for "yes"; this should lead to authentication prompt since we haven't authenticated before
                 + validAuthCode + "\n"  // since we should successfully authenticate, after this should be prompt for name of book to purchase
                 + book.name + "\n"      // entering book for purchase; this should lead to prompts for adding a book to library
-                + constructBookInput(null, book.author, book.year, book.isbn, book.bookID, book.genre)  // add book inputs; skipping name since it was already given
+                + constructBookInput(null, book.author, book.year, book.isbn, null, book.genre)  // add book inputs; skipping name/bookID since it was already given
                 + options.exit;         // purchase should lead to automatic checkout, so we're done now
 
         String output = runCLIWithInput(input);
