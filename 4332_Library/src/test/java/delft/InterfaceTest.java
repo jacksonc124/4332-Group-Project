@@ -111,8 +111,8 @@ public class InterfaceTest {
                 + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("Invalid input. Please enter a valid year as an integer.")); // error message for invalid year input
-        assertTrue(output.contains("Book added successfully."));
+        assertTrue(output.contains(invalidYearError())); // error message for invalid year input
+        assertTrue(output.contains(bookAdded()));
 
         // displayAll message check
         assertTrue(output.contains(booksInLibrary(true)));
@@ -137,8 +137,8 @@ public class InterfaceTest {
         assertTrue(output.contains(bookWasFound(false))); // error message for attempting to remove non-existent book
 
         // verifying default book was added & removed properly
-        assertTrue(output.contains("Book added successfully."));
-        assertTrue(output.contains("Book removed successfully."));
+        assertTrue(output.contains(bookAdded()));
+        assertTrue(output.contains(bookRemoved()));
         assertTrue(output.contains(booksInLibrary(false)));  // displayAll message check
     }
 
@@ -150,7 +150,7 @@ public class InterfaceTest {
             + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("New member has been successfully added."));
+        assertTrue(output.contains(memberAdded()));
 
         // checking listMembers displays the right info for our new member
         assertTrue(output.contains(membersInLibrary(true)));
@@ -163,19 +163,22 @@ public class InterfaceTest {
     // that after removing a member that their checked out books are available again. Also testing the member not found check.
     @Test
     void case5() {
+        String invalidMemberID = "M999";
+        String librarianAuthCode = "373737";
+
         String input = options.addBook + constructBookInput()
                 + options.addMember + constructMemberInput()
-                + options.removeMember + "373737\nM999\n"   // attempt to remove a non-existent member (373737 is the auth code for a librarian, required to revoke membership)
-                + options.checkoutBook + "1234\nM001\n"     // checkout default book for default member
-                + options.removeMember + "M001\n"           // 373737 auth code doesn't need to be passed again here because the library doesn't ask if you've already auth'd
+                + options.removeMember + librarianAuthCode + "\n" + invalidMemberID + "\n"  // attempt to remove a non-existent member (373737 is the auth code for a librarian, required to revoke membership)
+                + options.checkoutBook + book.bookID + "\n" + member.memberID + "\n"    // checkout default book for default member
+                + options.removeMember + member.memberID + "\n"          // 373737 auth code doesn't need to be passed again here because the library doesn't ask if you've already auth'd
                 + options.displayAll    // displaying all library books; should show the default book as available
                 + options.listMembers   // to check our removed member is no longer listed
                 + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("Member not found."));   // message from when we attempt to remove non-existent member
-        assertTrue(output.contains("Book checked out successfully."));
-        assertTrue(output.contains("Member removed successfully, and all borrowed books have been returned."));
+        assertTrue(output.contains(memberNotFound()));   // message from when we attempt to remove non-existent member
+        assertTrue(output.contains(bookCheckedOut()));
+        assertTrue(output.contains(memberRemoved()));
 
         // verifying displayAll has correct availability displayed
         assertTrue(output.contains(booksInLibrary(true)));
@@ -190,17 +193,20 @@ public class InterfaceTest {
     // Along with the added checks for invalid book and user ID inputs.
     @Test
     void case6() {
+        String invalidBookID = "9999";
+        String invalidMemberID = "M999";
+
         String input = options.addBook + constructBookInput()
                 + options.addMember + constructMemberInput()
-                + options.checkoutBook + "9999\nM001\n2\n" // 2\n is for the no to the purchase checkout thing; attempting to checkout invalid book for default member
-                + options.checkoutBook + "1234\nM999\n" // attempting to checkout default book for invalid member
-                + options.checkoutBook + "1234\nM001\n" // checkout default book for default member
+                + options.checkoutBook + invalidBookID + "\n" + member.memberID + "\n" + "2\n" // 2\n is for the no to the purchase checkout thing; attempting to checkout invalid book for default member
+                + options.checkoutBook + book.bookID + "\n" + invalidMemberID + "\n" // attempting to checkout default book for invalid member
+                + options.checkoutBook + book.bookID + "\n" + member.memberID + "\n" // checkout default book for default member
                 + options.displayAll
                 + options.listMembers
                 + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("Invalid member ID."));
+        assertTrue(output.contains(memberNotFound()));
         assertTrue(output.contains("Book checked out successfully."));
         assertTrue(output.contains(booksInLibrary(true)));
         assertTrue(output.contains(book.name));
@@ -216,60 +222,63 @@ public class InterfaceTest {
     // else has checked out. It looks convoluted though due to the kinda long branching paths.
     @Test
     void case7() {
-        String updatedName = "Jane Smith";
-        String updatedEmail = "jane.smith@example.com";
-        String updatedMemberID = "M002";
+        String otherMemberName = "Jane Smith";
+        String otherMemberEmail = "jane.smith@example.com";
+        String otherMemberMemberID = "M002";
+
+        String invalidBookID = "9999";
+        String invalidMemberID = "M999";
 
         String input = options.addBook + constructBookInput()
                 + options.addMember + constructMemberInput()
-                + options.addMember + constructMemberInput(updatedName, updatedEmail, updatedMemberID)
-                + options.returnBook + "1234\nM999\n"
-                + options.returnBook + "9999\nM001\n"
-                + options.checkoutBook + "1234\nM001\n"
-                + options.returnBook + "1234\nM002\n"
-                + options.returnBook + "1234\nM001\n"
-                + options.returnBook + "1234\nM001\n"
+                + options.addMember + constructMemberInput(otherMemberName, otherMemberEmail, otherMemberMemberID)
+                + options.returnBook + book.bookID + "\n" + invalidMemberID + "\n"
+                + options.returnBook + invalidBookID + "\n" + member.memberID + "\n"
+                + options.checkoutBook + book.bookID + "\n" + member.memberID + "\n"
+                + options.returnBook + book.bookID + "\n" + otherMemberMemberID + "\n"
+                + options.returnBook + book.bookID + "\n" + member.memberID + "\n"
+                + options.returnBook + book.bookID + "\n" + member.memberID + "\n"
                 + options.displayAll
                 + options.listMembers
                 + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains(bookWasFound(false)));
-        assertTrue(output.contains("Book checked out successfully."));
-        assertTrue(output.contains("This book is not loaned to the specified member."));
-        assertTrue(output.contains("Book returned successfully."));
-        assertTrue(output.contains("Book is already available and cannot be returned."));
+        assertTrue(output.contains(bookCheckedOut()));
+        assertTrue(output.contains(bookIsNotLoanedToMember()));
+        assertTrue(output.contains(bookReturned()));
+        assertTrue(output.contains(bookIsAlreadyReturned()));
         assertTrue(output.contains(booksInLibrary(true)));
         assertTrue(output.contains(book.name));
         assertTrue(output.contains(bookIsAvailable(true)));
         assertTrue(output.contains(membersInLibrary(true)));
         assertTrue(output.contains(member.name));
-        assertTrue(output.contains("Borrowed Books:"));
-        assertTrue(output.contains("No books currently borrowed."));
-        assertTrue(output.contains(updatedName));
-        assertTrue(output.contains("Borrowed Books:"));
-        assertTrue(output.contains("No books currently borrowed."));
+        assertTrue(output.contains(memberHasNoBooksOnBorrow()));
+        assertTrue(output.contains(otherMemberName));
+        assertTrue(output.contains(memberHasNoBooksOnBorrow()));
     }
 
     // This test just confirms that Divergent was found when searching for it.
     // Along with confirming it says who owns it if someone does and if it doesn't exist.
     @Test
     void case8() {
+        String invalidBookName = "NonExistentBook";
+
         String input = options.addBook + constructBookInput()
                 + options.addMember + constructMemberInput()
                 + options.searchForBook + book.name + "\n"
-                + options.checkoutBook + "1234\nM001\n"
+                + options.checkoutBook + book.bookID + "\n" + member.memberID + "\n"
                 + options.searchForBook + book.name + "\n"
-                + options.searchForBook + "NonExistentBook" + "\n"
+                + options.searchForBook + invalidBookName + "\n"
                 + options.exit;
         String output = runCLIWithInput(input);
 
         assertTrue(output.contains(bookWasFound(true)));
         assertTrue(output.contains(book.name));
-        assertTrue(output.contains("The book is currently available."));
-        assertTrue(output.contains("Book checked out successfully."));
+        assertTrue(output.contains(searchedBookIsAvailable()));
+        assertTrue(output.contains(bookCheckedOut()));
         assertTrue(output.contains(bookIsAvailable(false)));
-        assertTrue(output.contains("Currently checked out by Member ID: M001"));
+        assertTrue(output.contains(searchedBookCheckedOutBy(member.memberID)));
         assertTrue(output.contains(bookWasFound(false)));
     }
 
@@ -284,15 +293,17 @@ public class InterfaceTest {
         String updatedISBN = "ISBN-5678";
         String updatedGenre = "Action";
 
-        String input = options.editBookInfo + "9999\n"
+        String invalidBookID = "9999";
+
+        String input = options.editBookInfo + invalidBookID + "\n"
                 + options.addBook + constructBookInput()
                 + options.editBookInfo + book.bookID + "\n" + constructBookInput(updatedTitle, book.author, updatedYear, updatedISBN, null, updatedGenre)
                 + options.displayAll
                 + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("Book not found."));
-        assertTrue(output.contains("Book information updated successfully."));
+        assertTrue(output.contains(bookWasFound(false)));
+        assertTrue(output.contains(bookInfoUpdated()));
         assertTrue(output.contains(updatedTitle));
         assertTrue(output.contains(book.author));
         assertTrue(output.contains(updatedYear));
@@ -307,15 +318,17 @@ public class InterfaceTest {
         String updatedEmail = "jane.smith@example.com";
         String updatedMemberID = "M002";
 
-        String input = options.editMemberAccount + "M999\n"
+        String invalidMemberID = "M999";
+
+        String input = options.editMemberAccount + invalidMemberID + "\n"
                 + options.addMember + constructMemberInput()
                 + options.editMemberAccount + member.memberID + "\n" + constructMemberInput(updatedName, updatedEmail, updatedMemberID)
                 + options.listMembers
                 + options.exit;
         String output = runCLIWithInput(input);
 
-        assertTrue(output.contains("Member not found."));
-        assertTrue(output.contains("Member information updated successfully."));
+        assertTrue(output.contains(memberNotFound()));
+        assertTrue(output.contains(memberInfoUpdated()));
         assertTrue(output.contains(updatedName));
         assertTrue(output.contains(updatedEmail));
         assertTrue(output.contains(updatedMemberID));
@@ -332,10 +345,12 @@ public class InterfaceTest {
     // This test is just to confirm that the default works.
     @Test
     void testDefaultCase() {
-        String input = "99\n"   // invalid input
+        String invalidOption = "99";
+
+        String input = invalidOption + "\n"
                 + options.exit;
         String output = runCLIWithInput(input);
-        assertTrue(output.contains("Invalid option."));
+        assertTrue(output.contains(invalidOption()));
         assertTrue(output.contains(systemExit()));
     }
 
@@ -478,6 +493,77 @@ public class InterfaceTest {
             return "No members are currently in the library.";
         }
     }
+
+    private String invalidOption() {
+        return "Invalid option.";
+    }
+
+    private String invalidYearError() {
+        return "Invalid input. Please enter a valid year as an integer.";
+    }
+
+    private String bookAdded() {
+        return "Book added successfully.";
+    }
+
+    private String bookRemoved() {
+        return "Book removed successfully.";
+    }
+
+    private String bookReturned() {
+        return "Book returned successfully.";
+    }
+
+    private String bookIsNotLoanedToMember() {
+        return "This book is not loaned to the specified member.";
+    }
+
+    private String bookIsAlreadyReturned() {
+        return "Book is already available and cannot be returned.";
+    }
+
+    private String memberHasNoBooksOnBorrow() {
+        return "No books currently borrowed.";
+    }
+
+    private String bookCheckedOut() {
+        return "Book checked out successfully.";
+    }
+
+    private String searchedBookIsAvailable() {
+        return "The book is currently available.";
+    }
+
+    private String searchedBookCheckedOutBy(String memberID) {
+        return "Currently checked out by Member ID: " + memberID;
+    }
+
+    private String memberAdded() {
+        return "New member has been successfully added.";
+    }
+
+    private String memberRemoved() {
+        return "Member removed successfully, and all borrowed books have been returned.";
+    }
+
+    private String memberNotFound() {
+        return "Member not found.";
+    }
+
+    private String bookInfoUpdated() {
+        return "Book information updated successfully.";
+    }
+
+    private String memberInfoUpdated() {
+        return "Member information updated successfully.";
+    }
+
+
+
+
+
+
+
 
 
 }

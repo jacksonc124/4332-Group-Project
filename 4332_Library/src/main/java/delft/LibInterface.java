@@ -286,7 +286,7 @@ public class LibInterface {
         // First check if the member exists - no point allowing checkout or book purchase for a member that doesn't exist
         if (!library.MemberIDs.contains(memberID)) {
             canCheckout = false;
-            out.println("Invalid member ID.");
+            out.println("Member not found.");
             return;
         }
 
