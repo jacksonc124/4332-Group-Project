@@ -159,10 +159,10 @@ public class LibInterface {
 
     private void displayAllBooks() {
         // If there are no books, say that, otherwise print the list.
-        out.println("Books currently in the library:");
         if (library.AllBooksInLibrary.isEmpty()) {
             out.println("No books are currently in the library.");
         } else {
+            out.println("Books currently in the library:");
             for (Book book : library.AllBooksInLibrary) {
                 book.getBookInfo(out);
                 // Gotta make the list look pretty.
@@ -320,7 +320,7 @@ public class LibInterface {
                         break;
                     }
                     else {
-                        out.println("Please enter a valid option.");
+                        out.println("Invalid option.");
                     }
                 }
             }
@@ -441,10 +441,10 @@ public class LibInterface {
     }
 
     private void displayAllMembers() {
-        out.println("Members currently in the library:");
         if (library.getAllMembers().isEmpty()) {
             out.println("No members are currently in the library.");
         } else {
+            out.println("Members currently in the library:");
             // This just list all the current members.
             for (Member member : library.getAllMembers()) {
                 member.printMemberInfo(out);
