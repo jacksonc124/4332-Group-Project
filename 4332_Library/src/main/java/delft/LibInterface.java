@@ -24,6 +24,8 @@ public class LibInterface {
     }
 
     public void run() {
+        out.println("Group members: Alex Purcell, Arabelle Betzwieser, Eberechi Nwosu, Jack Cogan");
+
         // This is what the user will first see when starting. Containing all the options of how to proceed.
         while (true) {
             out.println("\nLSU Group I Library System");
